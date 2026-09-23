@@ -250,7 +250,7 @@ def test_captures_added_lines_with_absolute_line_numbers():
 
 ### Task 10: GitHub Action wrapper
 
-- [ ] Package the CLI as a GitHub Action that runs on `pull_request`, posts the `Verdict` as a single
+- [x] Package the CLI as a GitHub Action that runs on `pull_request`, posts the `Verdict` as a single
   review comment (one comment, not one per finding — noise is the enemy, §1).
 - [ ] Dogfood it on this repo's own PRs for a week before showing anyone.
 

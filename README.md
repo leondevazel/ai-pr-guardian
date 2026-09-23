@@ -28,6 +28,23 @@ python -m guardian.cli review <path-to-repo> <path-to-diff>
 
 Measured cost: **$0.0124 per PR** (Haiku for the specialists, Sonnet for the chief reviewer).
 
+## Run it on pull requests
+
+Add the secret `ANTHROPIC_API_KEY` to the repository, then use the action:
+
+```yaml
+- uses: actions/checkout@v4
+- uses: <owner>/ai-pr-guardian@main
+  with:
+    anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+    fail-on-block: "false"   # start here; flip once you trust the blocking path on your code
+```
+
+It posts a single comment and edits that same comment on later pushes, so a PR never accumulates
+review spam. The workflow runs on `pull_request`, not `pull_request_target`: the latter exposes
+secrets to code a fork controls, and a security tool does not get to be the hole. Fork PRs are
+therefore not reviewed automatically.
+
 ## Benchmark
 
 ```bash

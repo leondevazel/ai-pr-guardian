@@ -1,0 +1,40 @@
+name: AI PR Guardian
+description: Reviews a pull request with a multi-agent board and comments once with the verdict.
+author: ai-pr-guardian
+
+inputs:
+  anthropic-api-key:
+    description: Anthropic API key. Store it as a repository secret, never inline.
+    required: true
+  github-token:
+    description: Token used to read the PR and post the comment. The default job token is enough.
+    required: false
+    default: ${{ github.token }}
+  fail-on-block:
+    description: Fail the check when a security finding blocks. Start with false while calibrating.
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install guardian
+      shell: bash
+      run: pip install --quiet "${{ github.action_path }}"
+
+    - name: Review the pull request
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        python -m guardian.cli review-pr \
+          --repo "${{ github.repository }}" \
+          --pr "${{ github.event.pull_request.number }}" \
+          --checkout "${{ github.workspace }}" \
+          ${{ inputs.fail-on-block == 'true' && '--fail-on-block' || '' }}

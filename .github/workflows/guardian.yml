@@ -1,0 +1,35 @@
+name: Guardian review
+
+# `pull_request`, deliberately not `pull_request_target`.
+#
+# pull_request_target would run with secrets available on PRs from forks, while checking out
+# code the fork controls - the standard way secrets get exfiltrated from a CI pipeline. Guardian
+# is a security tool; it does not get to be the hole. The cost is that fork PRs are not reviewed
+# automatically, which is the right trade until there is a reason to do something cleverer.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  # One review per PR: a new push cancels the in-flight run rather than paying for both.
+  group: guardian-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./
+        with:
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Left false while the measured precision on the blocking path is still from a
+          # 38-example benchmark (RESULTS.md). Flip it once it has run on real PRs for a while.
+          fail-on-block: "false"

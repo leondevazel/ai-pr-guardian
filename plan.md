@@ -178,7 +178,7 @@ def test_captures_added_lines_with_absolute_line_numbers():
   (`concurrent.futures.ThreadPoolExecutor`), Round 2 rebuttals (findings text only, no diff re-send),
   Round 3 chief pass on Sonnet. Log per-call token usage to `runs/<timestamp>.json`.
 - [x] **Step 4: Run, verify pass**
-- [ ] **Step 5: Measure real cost** — run the CLI against the Task-1 fixture diff with real API keys
+- [x] **Step 5: Measure real cost** — measured 2026-09-23: **$0.0124/PR** (ceiling $0.15). — run the CLI against the Task-1 fixture diff with real API keys
   once; confirm total cost < $0.15 and record it in `runs/`. If over, cut Round 2 context first.
 - [x] **Step 6: Commit** — `feat: orchestrate 3-round review with deterministic verdict rule`
 

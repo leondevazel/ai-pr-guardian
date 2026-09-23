@@ -114,8 +114,10 @@ def _print_summary(results: dict, out_path: Path) -> None:
             f"{name:<12}{m['precision']:>11.2f}{m['recall']:>9.2f}{m['f1']:>8.2f}"
             f"{m['tp']:>5}{m['fp']:>5}{m['fn']:>5}{m['tn']:>5}"
         )
+    # ASCII only: Windows consoles default to cp949/cp1252, where an em dash aborts the run
+    # after the benchmark has already been paid for.
     print(
-        f"\nfindings per benign PR — pipeline {results['pipeline_noise_ratio']}, "
+        f"\nfindings per benign PR: pipeline {results['pipeline_noise_ratio']}, "
         f"semgrep {results['baseline_noise_ratio']}"
     )
     print(f"cost ${results['cost_usd']}   results: {out_path}")

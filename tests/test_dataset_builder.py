@@ -6,6 +6,7 @@ from benchmark.build_dataset import (
     ManifestEntry,
     is_reviewable_diff,
     reverse_diff,
+    select_candidates,
     validate_manifest,
     write_manifest,
 )
@@ -86,6 +87,42 @@ def test_rejects_oversized_diff():
     assert not is_reviewable_diff(huge)
 
 
+# --- candidate selection: one advisory can list several fix commits ---
+
+
+def candidate(id, repo="acme/app", commit="a1", cve_id=None):
+    return {"id": id, "repo": repo, "commit": commit, "cve_id": cve_id, "category": "x"}
+
+
+def test_one_advisory_yields_one_example():
+    # Regression: three fix commits for PYSEC-2012-7 filled the whole positive class and,
+    # because the diff file is named after the advisory, overwrote each other on disk.
+    picked = select_candidates(
+        [
+            candidate("PYSEC-2012-7", commit="a1"),
+            candidate("PYSEC-2012-7", commit="a2"),
+            candidate("PYSEC-2012-7", commit="a3"),
+        ]
+    )
+    assert len(picked) == 1
+
+
+def test_newer_advisories_come_first():
+    picked = select_candidates([candidate("PYSEC-2012-7"), candidate("PYSEC-2024-1")])
+    assert [c["id"] for c in picked] == ["PYSEC-2024-1", "PYSEC-2012-7"]
+
+
+def test_repos_are_interleaved_so_one_project_does_not_dominate():
+    picked = select_candidates(
+        [
+            candidate("PYSEC-2024-1", repo="django/django"),
+            candidate("PYSEC-2024-2", repo="django/django"),
+            candidate("PYSEC-2024-3", repo="pallets/flask"),
+        ]
+    )
+    assert [c["repo"] for c in picked[:2]] == ["django/django", "pallets/flask"]
+
+
 # --- manifest validation: the labels are the whole experiment, so guard them ---
 
 
@@ -98,6 +135,13 @@ def test_rejects_unbalanced_dataset():
     entries = [entry(id=f"v{i}") for i in range(5)] + [entry(id="b0", is_vulnerable=False)]
     with pytest.raises(ValueError, match="balance"):
         validate_manifest(entries)
+
+
+def test_rejects_truncated_dataset():
+    # A rate-limited build once produced 2 balanced examples and passed validation.
+    entries = [entry(), entry(id="b0", is_vulnerable=False)]
+    with pytest.raises(ValueError, match="at least"):
+        validate_manifest(entries, minimum=20)
 
 
 def test_accepts_balanced_dataset():

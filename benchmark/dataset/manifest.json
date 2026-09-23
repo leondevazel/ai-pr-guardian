@@ -1,0 +1,20 @@
+[
+  {
+    "id": "PYSEC-2025-61",
+    "repo": "python-pillow/pillow",
+    "commit": "89f1f4626a2aaf5f3d5ca6437f41def2998fbe09",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2025-61.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-48379",
+    "category": ""
+  },
+  {
+    "id": "benign-9ed5ac97f4",
+    "repo": "python-pillow/pillow",
+    "commit": "9ed5ac97f4f4f2754390af4fce39fc3b46945a7f",
+    "diff_path": "benchmark/dataset/diffs/benign-9ed5ac97f4.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  }
+]

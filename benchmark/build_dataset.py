@@ -9,6 +9,7 @@ Network access is confined to fetch_* functions; everything the tests care about
 
 import argparse
 import json
+import os
 import random
 import re
 import time
@@ -66,6 +67,39 @@ def reverse_diff(diff_text: str) -> str:
     return "".join(out)
 
 
+def select_candidates(candidates: list[dict]) -> list[dict]:
+    """One example per advisory, newest first, rotating between repos.
+
+    Without the per-advisory dedup, one CVE with several fix commits fills the whole positive
+    class — and since the diff file is named after the advisory, the copies overwrite each other.
+    """
+    unique: dict[str, dict] = {}
+    for candidate in candidates:
+        key = candidate.get("id") or candidate.get("commit")
+        if key and key not in unique:
+            unique[key] = candidate
+
+    ordered = sorted(unique.values(), key=lambda c: (-_year(c), c.get("repo", "")))
+
+    by_repo: dict[str, list[dict]] = {}
+    for candidate in ordered:
+        by_repo.setdefault(candidate.get("repo", ""), []).append(candidate)
+
+    interleaved = []
+    while any(by_repo.values()):
+        for queue in by_repo.values():
+            if queue:
+                interleaved.append(queue.pop(0))
+    return interleaved
+
+
+def _year(candidate: dict) -> int:
+    for field in ("cve_id", "id"):
+        if match := re.search(r"(19|20)\d{2}", str(candidate.get(field) or "")):
+            return int(match.group(0))
+    return 0
+
+
 def _strip_prefix(path: str) -> str:
     return path[2:] if path.startswith(("a/", "b/")) else path
 
@@ -78,7 +112,13 @@ def is_reviewable_diff(diff_text: str) -> bool:
     return any(path.endswith(SUPPORTED_SUFFIXES) for path in touched)
 
 
-def validate_manifest(entries: list[ManifestEntry]) -> None:
+def validate_manifest(entries: list[ManifestEntry], minimum: int = 0) -> None:
+    if len(entries) < minimum:
+        raise ValueError(
+            f"only {len(entries)} examples, expected at least {minimum}. A truncated benchmark "
+            "reads as a result but is not one — usually this means the build was rate limited."
+        )
+
     for entry in entries:
         if entry.is_vulnerable is None:
             raise ValueError(f"{entry.id}: is_vulnerable is unset; an unlabeled example is useless")
@@ -92,8 +132,8 @@ def validate_manifest(entries: list[ManifestEntry]) -> None:
         )
 
 
-def write_manifest(entries: list[ManifestEntry], path: Path) -> None:
-    validate_manifest(entries)
+def write_manifest(entries: list[ManifestEntry], path: Path, minimum: int = 0) -> None:
+    validate_manifest(entries, minimum=minimum)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps([asdict(e) for e in entries], indent=2), encoding="utf-8")
 
@@ -101,10 +141,41 @@ def write_manifest(entries: list[ManifestEntry], path: Path) -> None:
 # --- network ---------------------------------------------------------------
 
 
+class RateLimited(RuntimeError):
+    """Raised loudly: a rate-limited build silently produces a toy dataset otherwise."""
+
+
+def _github_token() -> str | None:
+    if token := os.environ.get("GITHUB_TOKEN"):
+        return token
+    env_file = Path(__file__).resolve().parents[1] / ".env"
+    if env_file.is_file():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            name, _, value = line.partition("=")
+            if name.strip() == "GITHUB_TOKEN" and value.strip():
+                return value.strip().strip("\"'")
+    return None
+
+
 def _get(url: str, accept: str = "application/json") -> str:
-    request = urllib.request.Request(url, headers={"Accept": accept, "User-Agent": "ai-pr-guardian"})
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return response.read().decode("utf-8", errors="replace")
+    headers = {"Accept": accept, "User-Agent": "ai-pr-guardian"}
+    if token := _github_token():
+        headers["Authorization"] = f"Bearer {token}"
+
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return response.read().decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as error:
+        if error.code in (403, 429) and error.headers.get("X-RateLimit-Remaining") == "0":
+            reset = int(error.headers.get("X-RateLimit-Reset", 0))
+            minutes = max(0, int((reset - time.time()) / 60))
+            raise RateLimited(
+                f"GitHub rate limit exhausted; resets in ~{minutes} min. "
+                "Re-run to resume (downloaded diffs are cached), or set GITHUB_TOKEN in .env "
+                "for 5000 requests/hour."
+            ) from error
+        raise
 
 
 def fetch_fix_commits(ecosystem: str, package: str) -> list[dict]:
@@ -143,66 +214,83 @@ def fetch_commit_diff(repo: str, sha: str) -> str | None:
     try:
         return _get(f"{GITHUB_API}/repos/{repo}/commits/{sha}", accept="application/vnd.github.diff")
     except (urllib.error.HTTPError, urllib.error.URLError):
-        return None
+        return None  # commit genuinely unreachable; RateLimited is not caught here
 
 
 def fetch_recent_commits(repo: str, limit: int = 30) -> list[str]:
     try:
         raw = _get(f"{GITHUB_API}/repos/{repo}/commits?per_page={limit}")
     except (urllib.error.HTTPError, urllib.error.URLError):
-        return []
+        return []  # repo gone or renamed; RateLimited is not caught here
     return [c["sha"] for c in json.loads(raw)]
 
 
 # --- assembly --------------------------------------------------------------
 
 
+def _load_existing(out_dir: Path) -> list[ManifestEntry]:
+    manifest = out_dir / "manifest.json"
+    if not manifest.is_file():
+        return []
+    entries = [ManifestEntry(**row) for row in json.loads(manifest.read_text(encoding="utf-8"))]
+    return [e for e in entries if Path(e.diff_path).is_file()]
+
+
 def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path) -> list[ManifestEntry]:
     diffs_dir = out_dir / "diffs"
     diffs_dir.mkdir(parents=True, exist_ok=True)
 
-    positives: list[ManifestEntry] = []
-    fix_shas: set[str] = set()
-    repos_seen: list[str] = []
+    # Resume: a rate-limited run is expected, so keep whatever earlier runs already downloaded.
+    existing = _load_existing(out_dir)
+    positives = [e for e in existing if e.is_vulnerable]
+    known_ids = {e.id for e in existing}
+    fix_shas: set[str] = {e.commit for e in existing}
+    repos_seen: list[str] = [e.repo for e in positives]
+    if existing:
+        print(f"resuming from {len(positives)} positives, {len(existing) - len(positives)} negatives")
 
+    candidates = []
     for ecosystem, package in packages:
+        candidates.extend(fetch_fix_commits(ecosystem, package))
+    print(f"{len(candidates)} fix commits from OSV; deduplicating by advisory")
+
+    for fix in select_candidates(candidates):
         if len(positives) >= target_per_class:
             break
-        for fix in fetch_fix_commits(ecosystem, package):
-            if len(positives) >= target_per_class:
-                break
-            if not fix["repo"] or fix["commit"] in fix_shas:
-                continue
-            diff = fetch_commit_diff(fix["repo"], fix["commit"])
-            time.sleep(1)  # unauthenticated GitHub allows 60 requests/hour
-            if not diff or not is_reviewable_diff(diff):
-                continue
+        if not fix["repo"] or fix["commit"] in fix_shas or fix["id"] in known_ids:
+            continue
+        diff = fetch_commit_diff(fix["repo"], fix["commit"])
+        time.sleep(1)  # unauthenticated GitHub allows 60 requests/hour
+        if not diff or not is_reviewable_diff(diff):
+            continue
 
-            fix_shas.add(fix["commit"])
-            repos_seen.append(fix["repo"])
-            name = f"{fix['id']}.diff"
-            (diffs_dir / name).write_text(reverse_diff(diff), encoding="utf-8")
-            positives.append(
-                ManifestEntry(
-                    id=fix["id"],
-                    repo=fix["repo"],
-                    commit=fix["commit"],
-                    diff_path=str((diffs_dir / name).as_posix()),
-                    is_vulnerable=True,
-                    cve_id=fix["cve_id"],
-                    category=fix["category"],
-                )
+        fix_shas.add(fix["commit"])
+        repos_seen.append(fix["repo"])
+        name = f"{fix['id']}.diff"
+        (diffs_dir / name).write_text(reverse_diff(diff), encoding="utf-8")
+        positives.append(
+            ManifestEntry(
+                id=fix["id"],
+                repo=fix["repo"],
+                commit=fix["commit"],
+                diff_path=str((diffs_dir / name).as_posix()),
+                is_vulnerable=True,
+                cve_id=fix["cve_id"],
+                category=fix["category"],
             )
-            print(f"  + positive {fix['id']} ({fix['repo']})")
+        )
+        print(f"  + positive {fix['id']} ({fix['repo']})")
 
-    negatives: list[ManifestEntry] = []
-    for repo in _cycle_unique(repos_seen):
+    # One benign example per positive, from the SAME repo. Without this the negatives all come
+    # from whichever repo is listed first, and the classifier can separate the classes by
+    # project style instead of by whether the code is vulnerable.
+    negatives: list[ManifestEntry] = [e for e in existing if not e.is_vulnerable]
+    covered_repos = {e.repo for e in negatives}
+    for repo in [r for r in repos_seen if r not in covered_repos]:
         if len(negatives) >= len(positives):
             break
         for sha in fetch_recent_commits(repo):
-            if len(negatives) >= len(positives):
-                break
-            if sha in fix_shas:
+            if sha in fix_shas or any(n.commit == sha for n in negatives):
                 continue
             diff = fetch_commit_diff(repo, sha)
             time.sleep(1)
@@ -223,19 +311,11 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
                 )
             )
             print(f"  - negative {sha[:10]} ({repo})")
+            break  # one per repo, then move on to match the next positive
 
     entries = positives[: len(negatives)] + negatives
     random.shuffle(entries)
     return entries
-
-
-def _cycle_unique(items: list[str]) -> list[str]:
-    seen, unique = set(), []
-    for item in items:
-        if item not in seen:
-            seen.add(item)
-            unique.append(item)
-    return unique
 
 
 DEFAULT_PACKAGES = [
@@ -254,11 +334,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="build the labeled benchmark dataset")
     parser.add_argument("--per-class", type=int, default=25, help="target examples per class")
     parser.add_argument("--out", default="benchmark/dataset", help="output directory")
+    parser.add_argument(
+        "--minimum", type=int, default=0, help="fail if fewer than this many examples were built"
+    )
     args = parser.parse_args()
 
     out_dir = Path(args.out)
-    entries = build(DEFAULT_PACKAGES, args.per_class, out_dir)
-    write_manifest(entries, out_dir / "manifest.json")
+    try:
+        entries = build(DEFAULT_PACKAGES, args.per_class, out_dir)
+    except RateLimited as limit:
+        print(f"\n{limit}")
+        raise SystemExit(2) from limit
+
+    write_manifest(entries, out_dir / "manifest.json", minimum=args.minimum)
     print(f"\nwrote {len(entries)} examples to {out_dir / 'manifest.json'}")
 
 

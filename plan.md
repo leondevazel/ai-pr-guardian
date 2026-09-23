@@ -1,7 +1,7 @@
 # AI PR Guardian — Implementation Plan
 
 > **For agentic workers:** Use superpowers:subagent-driven-development or superpowers:executing-plans
-> to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a multi-agent PR reviewer that turns noisy static-analysis output into a small number
 of high-confidence findings, and prove it works with precision/recall numbers on a public
@@ -46,7 +46,7 @@ methodology live there; this plan only says how to build it)
   `PRContext(files: list[ChangedFile])` and
   `ChangedFile(path: str, hunks: list[Hunk])`, `Hunk(start_line: int, added_lines: list[tuple[int, str]], context: str)`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # tests/test_diff_parser.py
@@ -67,10 +67,10 @@ def test_captures_added_lines_with_absolute_line_numbers():
   Fixture `tests/fixtures/sample.diff` is a real unified diff introducing an f-string SQL query at
   line 12 of `app/db.py` (write it by hand; keep it under 20 lines).
 
-- [ ] **Step 2: Run test, verify it fails** — `pytest tests/test_diff_parser.py -v` → `ModuleNotFoundError: guardian.diff_parser`
-- [ ] **Step 3: Implement** `parse_diff` using `unidiff.PatchSet`, mapping `line.target_line_no` for added lines.
-- [ ] **Step 4: Run tests, verify pass**
-- [ ] **Step 5: Commit** — `feat: parse unified diffs into PRContext`
+- [x] **Step 2: Run test, verify it fails** — `pytest tests/test_diff_parser.py -v` → `ModuleNotFoundError: guardian.diff_parser`
+- [x] **Step 3: Implement** `parse_diff` using `unidiff.PatchSet`, mapping `line.target_line_no` for added lines.
+- [x] **Step 4: Run tests, verify pass**
+- [x] **Step 5: Commit** — `feat: parse unified diffs into PRContext`
 
 ### Task 2: Semgrep tool wrapper
 
@@ -84,16 +84,16 @@ def test_captures_added_lines_with_absolute_line_numbers():
   `ToolFinding(file: str, line: int, rule_id: str, message: str, severity: str)`
 - Also produces: `parse_semgrep_json(raw: dict) -> list[ToolFinding]` — the pure function the test targets
 
-- [ ] **Step 1: Write the failing test** against `parse_semgrep_json` using a saved real Semgrep JSON
+- [x] **Step 1: Write the failing test** against `parse_semgrep_json` using a saved real Semgrep JSON
   fixture (generate it once by running Semgrep on the Task-1 fixture file, save the output). Assert
   rule_id, file, and line are extracted and that `severity` maps `ERROR->block`, `WARNING->warn`,
   `INFO->nit`.
-- [ ] **Step 2: Run test, verify it fails**
-- [ ] **Step 3: Implement** — `run_semgrep` shells out to
+- [x] **Step 2: Run test, verify it fails**
+- [x] **Step 3: Implement** — `run_semgrep` shells out to
   `semgrep --config=p/security-audit --json <files>`; `parse_semgrep_json` does the pure parsing.
   Subprocess call is NOT under test; the parser is.
-- [ ] **Step 4: Run tests, verify pass**
-- [ ] **Step 5: Commit** — `feat: wrap semgrep as a tool returning ToolFindings`
+- [x] **Step 4: Run tests, verify pass**
+- [x] **Step 5: Commit** — `feat: wrap semgrep as a tool returning ToolFindings`
 
 ### Task 3: Repo context extractor
 
@@ -105,14 +105,14 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Produces: `get_context(repo_path: str, file: str, line: int) -> FileContext` where
   `FileContext(enclosing_function: str, related_tests: list[str], imports: list[str])`
 
-- [ ] **Step 1: Write failing tests** — enclosing function is found for a line inside a function;
+- [x] **Step 1: Write failing tests** — enclosing function is found for a line inside a function;
   a test file referencing that function name is listed in `related_tests`; imports are extracted.
-- [ ] **Step 2: Run, verify fail**
-- [ ] **Step 3: Implement** using `ast` for Python files (walk `FunctionDef` nodes, pick the one whose
+- [x] **Step 2: Run, verify fail**
+- [x] **Step 3: Implement** using `ast` for Python files (walk `FunctionDef` nodes, pick the one whose
   line range contains `line`), and a plain filename+symbol grep for `related_tests`. Non-Python files:
   return ±20 raw lines as `enclosing_function` and empty lists — do not build a multi-language parser.
-- [ ] **Step 4: Run, verify pass**
-- [ ] **Step 5: Commit** — `feat: extract enclosing function, related tests, imports`
+- [x] **Step 4: Run, verify pass**
+- [x] **Step 5: Commit** — `feat: extract enclosing function, related tests, imports`
 
 ---
 

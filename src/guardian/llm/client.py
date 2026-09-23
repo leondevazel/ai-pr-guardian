@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import anthropic
 
@@ -12,11 +13,30 @@ PRICES = {
 }
 
 
+def load_api_key() -> str:
+    """Environment wins; otherwise read .env from the repo root. Never logged, never printed."""
+    if key := os.environ.get("ANTHROPIC_API_KEY"):
+        return key
+
+    env_file = Path(__file__).resolve().parents[3] / ".env"
+    if env_file.is_file():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            name, _, value = line.partition("=")
+            if name.strip() == "ANTHROPIC_API_KEY":
+                return value.strip().strip("\"'")
+
+    raise RuntimeError(
+        "No ANTHROPIC_API_KEY found. Create a .env file in the project root containing:\n"
+        "ANTHROPIC_API_KEY=sk-ant-...\n"
+        "(.env is gitignored.)"
+    )
+
+
 class AnthropicClient:
     """The only place that talks to the API. Agents take a client so tests can pass a fake."""
 
     def __init__(self, api_key: str | None = None, max_tokens: int = 2000):
-        self._client = anthropic.Anthropic(api_key=api_key or os.environ["ANTHROPIC_API_KEY"])
+        self._client = anthropic.Anthropic(api_key=api_key or load_api_key())
         self.max_tokens = max_tokens
         self.usage: list[dict] = []
 

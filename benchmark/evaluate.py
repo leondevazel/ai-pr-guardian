@@ -14,7 +14,7 @@ from benchmark.baselines import semgrep_baseline_at
 from benchmark.build_dataset import GITHUB_API, _get
 from guardian.llm.client import AnthropicClient
 from guardian.models import Verdict
-from guardian.orchestrator import decide, review_pr
+from guardian.orchestrator import decide_on_all, review_pr
 
 FLAGGED = {"block", "request_changes"}
 
@@ -43,21 +43,20 @@ def score(predictions: list[str], labels: list[bool]) -> Metrics:
     return Metrics(precision, recall, f1, tp, fp, tn, fn)
 
 
-def security_only_decision(verdict: Verdict) -> str:
-    """What the verdict would be if only the security agent's findings counted.
+def all_findings_decision(verdict: Verdict) -> str:
+    """What the verdict would be if advisory findings could gate a merge too.
 
-    The benchmark label is "does this diff contain a known vulnerability". An architecture or
-    business-logic finding can therefore only ever score as a false positive, however correct it
-    is — the label has no way to credit it. Scoring both views keeps that distinction visible
-    instead of blaming the pipeline for answering a question the label never asked."""
-    return decide([f for f in verdict.findings if f.agent == "security"])
+    This is no longer what the product does (RESULTS.md), but it stays scored: it is the view that
+    shows how much recall the architecture and business-logic agents contribute, and how much
+    precision that recall costs."""
+    return decide_on_all(verdict.findings + verdict.advisory)
 
 
 def noise_ratio(verdicts: list[Verdict], labels: list[bool]) -> float:
     benign = [v for v, y in zip(verdicts, labels) if not y]
     if not benign:
         return 0.0
-    return sum(len(v.findings) for v in benign) / len(benign)
+    return sum(len(v.findings) + len(v.advisory) for v in benign) / len(benign)
 
 
 def _post_change_ref(entry: dict) -> str:
@@ -93,8 +92,8 @@ def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
         )
 
         labels.append(bool(entry["is_vulnerable"]))
-        pipeline_predictions.append(verdict.decision)
-        security_predictions.append(security_only_decision(verdict))
+        pipeline_predictions.append(all_findings_decision(verdict))
+        security_predictions.append(verdict.decision)
         pipeline_verdicts.append(verdict)
         baseline_predictions.append(baseline_decision)
         baseline_finding_counts.append(baseline_count)
@@ -103,9 +102,10 @@ def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
             {
                 "id": entry["id"],
                 "is_vulnerable": entry["is_vulnerable"],
-                "pipeline": verdict.decision,
-                "pipeline_security_only": security_only_decision(verdict),
+                "pipeline": all_findings_decision(verdict),
+                "pipeline_security_only": verdict.decision,
                 "pipeline_findings": [asdict(f) for f in verdict.findings],
+                "advisory_findings": [asdict(f) for f in verdict.advisory],
                 "rationale": verdict.rationale,
                 "baseline": baseline_decision,
                 "baseline_findings": baseline_count,
@@ -171,7 +171,7 @@ def summarize_repeats(runs: list[dict]) -> None:
         f1s = [r[view]["f1"] for r in runs]
         print(f"{view:<24} f1 min {min(f1s):.2f}  max {max(f1s):.2f}  mean {sum(f1s)/len(f1s):.2f}")
 
-    per_example = [{e["id"]: e["pipeline"] for e in r["examples"]} for r in runs]
+    per_example = [{e["id"]: e["pipeline_security_only"] for e in r["examples"]} for r in runs]
     ids = set(per_example[0])
     unstable = [i for i in ids if len({d.get(i) for d in per_example}) > 1]
     print(f"verdicts that differ between runs: {len(unstable)} of {len(ids)}")

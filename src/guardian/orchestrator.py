@@ -14,8 +14,19 @@ WARN_THRESHOLD = 0.5
 
 AGENT_CLASSES = (SecurityAgent, ArchitectureAgent, BusinessLogicAgent)
 
+# Only the security agent can hold up a merge. On the 38-example benchmark it filed 6 findings,
+# all 6 genuine vulnerabilities, 0 false positives; architecture and business_logic together
+# produced all 13 false positives while adding real recall. So they advise, they do not gate.
+# See RESULTS.md, "Two operating points, not one".
+BLOCKING_AGENTS = {"security"}
+
 
 def decide(findings: list[Finding]) -> Decision:
+    return decide_on_all([f for f in findings if f.agent in BLOCKING_AGENTS])
+
+
+def decide_on_all(findings: list[Finding]) -> Decision:
+    """Thresholds applied to every finding regardless of author — the benchmark's comparison view."""
     if any(f.severity == "block" and f.confidence >= BLOCK_THRESHOLD for f in findings):
         return "block"
     if any(f.severity == "warn" and f.confidence >= WARN_THRESHOLD for f in findings):
@@ -46,7 +57,12 @@ def review_pr(repo_path: str, diff_text: str, client, run_semgrep=_run_semgrep) 
     kept, rationale = ChiefReviewer(client).select(all_findings)
     kept.sort(key=lambda f: (_severity_rank(f.severity), -f.confidence))
 
-    return Verdict(decision=decide(kept), findings=kept, rationale=rationale)
+    blocking = [f for f in kept if f.agent in BLOCKING_AGENTS]
+    advisory = [f for f in kept if f.agent not in BLOCKING_AGENTS]
+
+    return Verdict(
+        decision=decide(blocking), findings=blocking, advisory=advisory, rationale=rationale
+    )
 
 
 def _repo_contexts(repo_path: str, ctx) -> list:

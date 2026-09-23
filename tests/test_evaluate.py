@@ -1,27 +1,32 @@
-from benchmark.evaluate import noise_ratio, score, security_only_decision
+from benchmark.evaluate import all_findings_decision, noise_ratio, score
 from guardian.models import Finding, Verdict
-
-
-def sec_verdict(*findings):
-    return Verdict(decision="block", findings=list(findings), rationale="")
 
 
 def f(agent, severity="block", confidence=0.9):
     return Finding(agent, "a.py", 1, severity, "cat", "claim", "evidence", confidence)
 
 
-def test_security_only_ignores_architecture_findings():
-    # The label is "contains a known vulnerability", so an architecture finding can only ever
-    # score as a false positive; the security-only view keeps the two questions apart.
-    assert security_only_decision(sec_verdict(f("architecture"))) == "approve"
+# all_findings_decision is the comparison view: it asks what would happen if advisory findings
+# could gate a merge too. The product itself gates on security findings only (orchestrator.decide).
 
 
-def test_security_only_keeps_security_findings():
-    assert security_only_decision(sec_verdict(f("security"))) == "block"
+def test_all_findings_view_counts_advisory_findings():
+    v = Verdict(decision="approve", findings=[], rationale="", advisory=[f("architecture")])
+    assert all_findings_decision(v) == "block"
 
 
-def test_security_only_applies_the_same_thresholds():
-    assert security_only_decision(sec_verdict(f("security", confidence=0.69))) == "approve"
+def test_all_findings_view_counts_security_findings():
+    v = Verdict(decision="block", findings=[f("security")], rationale="")
+    assert all_findings_decision(v) == "block"
+
+
+def test_all_findings_view_applies_the_same_thresholds():
+    v = Verdict(decision="approve", findings=[f("security", confidence=0.69)], rationale="")
+    assert all_findings_decision(v) == "approve"
+
+
+def test_all_findings_view_approves_when_nothing_was_raised():
+    assert all_findings_decision(Verdict(decision="approve", findings=[], rationale="")) == "approve"
 
 
 def verdict(decision, n_findings=0):

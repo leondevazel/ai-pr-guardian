@@ -94,6 +94,13 @@ Decision rule (deterministic, in code, not left to the LLM to decide the thresho
 `block` if any `Finding` has `severity=="block"` and `confidence >= 0.7` after rebuttal;
 `request_changes` if any `warn` finding has `confidence >= 0.5`; else `approve`.
 
+**Only the security agent's findings enter that rule.** On the 38-example benchmark the security
+agent filed 6 findings, all 6 real vulnerabilities, 0 false positives — while architecture and
+business_logic together produced all 13 false positives, at the cost of genuine extra recall
+(RESULTS.md). So the verdict has two tiers: security findings gate the merge, and the other two
+agents' findings ship as advisory comments that never block. `Verdict.findings` holds the blocking
+set; `Verdict.advisory` holds the rest.
+
 ## 5. Evaluation methodology (this is the actual deliverable)
 
 A demo without numbers is not "professional level" — this is the part that makes the project real.

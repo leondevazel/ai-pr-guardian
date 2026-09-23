@@ -50,3 +50,4 @@ class Verdict:
     decision: Decision
     findings: list[Finding]
     rationale: str
+    advisory: list[Finding] = field(default_factory=list)

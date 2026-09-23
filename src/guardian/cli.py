@@ -39,13 +39,26 @@ def main(argv=None) -> int:
 def _print_verdict(verdict, client, run_path: Path) -> None:
     print(f"\n=== {DECISION_LABEL[verdict.decision]} ===\n")
     print(verdict.rationale + "\n")
-    for f in verdict.findings:
-        print(f"  [{f.severity}] {f.file}:{f.line}  ({f.category}, confidence {f.confidence:.2f})")
-        print(f"      {f.claim}")
-        print(f"      via {f.agent}\n")
-    if not verdict.findings:
-        print("  no findings worth your attention\n")
+
+    if verdict.findings:
+        print("BLOCKING (security):")
+        for f in verdict.findings:
+            _print_finding(f)
+    else:
+        print("BLOCKING (security): none\n")
+
+    if verdict.advisory:
+        print("ADVISORY (does not block the merge):")
+        for f in verdict.advisory:
+            _print_finding(f)
+
     print(f"cost: ${client.total_cost_usd():.4f}   run log: {run_path}")
+
+
+def _print_finding(f) -> None:
+    print(f"  [{f.severity}] {f.file}:{f.line}  ({f.category}, confidence {f.confidence:.2f})")
+    print(f"      {f.claim}")
+    print(f"      via {f.agent}\n")
 
 
 def _log_run(verdict, client) -> Path:

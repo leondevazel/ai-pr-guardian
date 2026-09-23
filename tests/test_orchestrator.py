@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 from guardian.models import Finding
-from guardian.orchestrator import decide, review_pr
+from guardian.orchestrator import decide, decide_on_all, review_pr
 
 SAMPLE_DIFF = (Path(__file__).parent / "fixtures" / "sample.diff").read_text()
 REPO = str(Path(__file__).parent / "fixtures" / "fakerepo")
@@ -23,6 +23,10 @@ def finding(severity="block", confidence=0.9, agent="security", line=12, categor
 
 
 # --- decide(): the threshold rule from agent.md §4, deterministic and LLM-free ---
+#
+# Only the security agent can block. On the benchmark it filed 6 findings, all 6 real
+# vulnerabilities, 0 false positives — while architecture and business_logic together produced
+# every one of the 13 false positives (RESULTS.md). Their findings still ship, as advisory.
 
 
 def test_block_finding_at_threshold_blocks():
@@ -31,6 +35,26 @@ def test_block_finding_at_threshold_blocks():
 
 def test_block_finding_below_threshold_does_not_block():
     assert decide([finding(severity="block", confidence=0.69)]) == "approve"
+
+
+def test_architecture_finding_never_blocks_however_confident():
+    assert decide([finding(agent="architecture", severity="block", confidence=0.99)]) == "approve"
+
+
+def test_business_logic_finding_never_blocks():
+    assert decide([finding(agent="business_logic", severity="warn", confidence=0.95)]) == "approve"
+
+
+def test_security_finding_still_blocks_alongside_advisory_ones():
+    findings = [
+        finding(agent="architecture", severity="block", confidence=0.99),
+        finding(agent="security", severity="block", confidence=0.8),
+    ]
+    assert decide(findings) == "block"
+
+
+def test_decide_on_all_keeps_the_unfiltered_view_for_the_benchmark():
+    assert decide_on_all([finding(agent="architecture", severity="block", confidence=0.9)]) == "block"
 
 
 def test_block_finding_below_threshold_still_requests_changes_if_warn_qualifies():
@@ -156,3 +180,24 @@ def test_chief_cannot_invent_findings_it_only_selects_indices():
     verdict = review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [])
 
     assert len(verdict.findings) == 1
+
+
+def test_advisory_findings_are_returned_separately_from_blocking_ones():
+    client = ScriptedClient(
+        round1={"architecture": findings_json({"severity": "block", "category": "layering"})},
+        chief=CHIEF_KEEPS_ALL,
+    )
+    verdict = review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [])
+
+    assert verdict.decision == "approve"
+    assert verdict.findings == []
+    assert [f.category for f in verdict.advisory] == ["layering"]
+
+
+def test_security_findings_stay_in_the_blocking_list():
+    client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
+    verdict = review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [])
+
+    assert verdict.decision == "block"
+    assert [f.agent for f in verdict.findings] == ["security"]
+    assert verdict.advisory == []

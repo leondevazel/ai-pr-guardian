@@ -35,19 +35,18 @@ def load_api_key() -> str:
 class AnthropicClient:
     """The only place that talks to the API. Agents take a client so tests can pass a fake."""
 
-    def __init__(self, api_key: str | None = None, max_tokens: int = 2000, temperature: float = 0.0):
+    def __init__(self, api_key: str | None = None, max_tokens: int = 2000):
         self._client = anthropic.Anthropic(api_key=api_key or load_api_key())
         self.max_tokens = max_tokens
-        # Defaults to 1.0 at the API. Run 01 and run 02 disagreed on 18 of 38 verdicts, which made
-        # every prompt change unmeasurable: the difference between runs swamped the effect.
-        self.temperature = temperature
         self.usage: list[dict] = []
 
     def complete(self, system: str, user: str, model: str) -> str:
+        # No temperature knob: the Messages API in SDK 1.x dropped it. Run-to-run variance is
+        # therefore a property of the benchmark, not something to suppress — evaluate.py measures
+        # it by repeating runs instead of pretending the pipeline is deterministic.
         response = self._client.messages.create(
             model=model,
             max_tokens=self.max_tokens,
-            temperature=self.temperature,
             system=system,
             messages=[{"role": "user", "content": user}],
         )

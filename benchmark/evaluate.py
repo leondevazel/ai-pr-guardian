@@ -157,14 +157,38 @@ def _print_summary(results: dict, out_path: Path) -> None:
     print(f"cost ${results['cost_usd']}   results: {out_path}")
 
 
+def summarize_repeats(runs: list[dict]) -> None:
+    """Reports the spread across identical runs.
+
+    The Messages API exposes no temperature, so the pipeline is not deterministic. A single run's
+    F1 is one draw from a distribution; quoting it alone would let run-to-run noise pass as the
+    effect of a change."""
+    if len(runs) < 2:
+        return
+
+    print(f"\n=== {len(runs)} identical runs ===")
+    for view in ("pipeline", "pipeline_security_only", "baseline"):
+        f1s = [r[view]["f1"] for r in runs]
+        print(f"{view:<24} f1 min {min(f1s):.2f}  max {max(f1s):.2f}  mean {sum(f1s)/len(f1s):.2f}")
+
+    per_example = [{e["id"]: e["pipeline"] for e in r["examples"]} for r in runs]
+    ids = set(per_example[0])
+    unstable = [i for i in ids if len({d.get(i) for d in per_example}) > 1]
+    print(f"verdicts that differ between runs: {len(unstable)} of {len(ids)}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="score the pipeline against the benchmark")
     parser.add_argument("--manifest", default="benchmark/dataset/manifest.json")
     parser.add_argument("--limit", type=int, default=None, help="only the first N examples")
     parser.add_argument("--out", default="benchmark/results")
+    parser.add_argument(
+        "--repeats", type=int, default=1, help="run the benchmark N times to measure variance"
+    )
     args = parser.parse_args()
 
-    run(Path(args.manifest), args.limit, Path(args.out))
+    runs = [run(Path(args.manifest), args.limit, Path(args.out)) for _ in range(args.repeats)]
+    summarize_repeats(runs)
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ name = "ai-pr-guardian"
 version = "0.1.0"
 description = "A multi-agent review board that triages AI-generated code changes"
 requires-python = ">=3.11"
-dependencies = ["unidiff==0.7.5", "anthropic==0.40.0", "semgrep"]
+dependencies = ["unidiff==0.7.5", "anthropic>=1.7,<2", "semgrep"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

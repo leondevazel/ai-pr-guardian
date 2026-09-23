@@ -7,3 +7,5 @@ venv/
 runs/
 benchmark/dataset/diffs/
 benchmark/results/
+benchmark_run.log
+*.egg-info/

@@ -196,15 +196,15 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Produces: `benchmark/dataset/manifest.json` — list of
   `{id, repo, commit, diff_path, is_vulnerable: bool, cve_id: str|None, category: str|None}`
 
-- [ ] **Step 1: Write failing test** — manifest builder rejects an entry missing `is_vulnerable`, and
+- [x] **Step 1: Write failing test** — manifest builder rejects an entry missing `is_vulnerable`, and
   produces balanced counts (equal positives and negatives) or fails loudly.
-- [ ] **Step 2: Run, verify fail**
-- [ ] **Step 3: Implement.** Positives: CVE-fixing commits from a public dataset (CVEfixes/BigVul
+- [x] **Step 2: Run, verify fail**
+- [x] **Step 3: Implement.** Positives: CVE-fixing commits from a public dataset (CVEfixes/BigVul
   slice), filtered to Python/JS, taking the **pre-fix** diff. Negatives: merged PRs from the same
   repos with no linked CVE. Target 40-60 total, balanced. Store diffs as files, commit the manifest
   only.
-- [ ] **Step 4: Run, verify pass**
-- [ ] **Step 5: Commit** — `feat: build balanced benchmark dataset from CVE-fix commits`
+- [x] **Step 4: Run, verify pass**
+- [x] **Step 5: Commit** — `feat: build balanced benchmark dataset from CVE-fix commits`
 
 ### Task 8: Evaluation harness + Semgrep baseline
 
@@ -218,14 +218,14 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Produces: `noise_ratio(verdicts, labels) -> float` — mean findings per *benign* PR
 - Produces: `semgrep_baseline(diff, repo) -> str` — `"request_changes"` if ≥1 Semgrep finding else `"approve"`
 
-- [ ] **Step 1: Write failing tests** for `score()` with hand-computed tiny cases (3 TP, 1 FP, 2 FN →
+- [x] **Step 1: Write failing tests** for `score()` with hand-computed tiny cases (3 TP, 1 FP, 2 FN →
   known precision/recall), and for `noise_ratio` ignoring vulnerable examples.
-- [ ] **Step 2: Run, verify fail**
-- [ ] **Step 3: Implement** metrics + baseline; `evaluate.py` runs both the full pipeline and the
+- [x] **Step 2: Run, verify fail**
+- [x] **Step 3: Implement** metrics + baseline; `evaluate.py` runs both the full pipeline and the
   baseline over the manifest, writes `benchmark/results/<timestamp>.json` with raw counts (not just
   percentages, per `agent.md` §7).
-- [ ] **Step 4: Run, verify pass**
-- [ ] **Step 5: Commit** — `feat: evaluation harness with semgrep baseline comparison`
+- [x] **Step 4: Run, verify pass**
+- [x] **Step 5: Commit** — `feat: evaluation harness with semgrep baseline comparison`
 
 ### Task 9: Calibration loop + results writeup
 
@@ -233,16 +233,16 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Modify: agent system prompts, `orchestrator.decide` thresholds
 - Create: `RESULTS.md`
 
-- [ ] **Step 1: Run the full benchmark** — record baseline vs. pipeline F1 and noise ratio.
-- [ ] **Step 2: Inspect every false positive and false negative by hand** — categorize causes
+- [x] **Step 1: Run the full benchmark** — record baseline vs. pipeline F1 and noise ratio.
+- [x] **Step 2: Inspect every false positive and false negative by hand** — categorize causes
   (prompt issue / threshold issue / Semgrep coverage gap). This is the actual engineering work; budget
   the most time here.
-- [ ] **Step 3: Change ONE variable at a time** (a prompt, or a threshold — never both), re-run, record.
+- [x] **Step 3: Change ONE variable at a time** (a prompt, or a threshold — never both), re-run, record.
   Keep every run's JSON; the run history is portfolio evidence.
-- [ ] **Step 4: Write `RESULTS.md`** — table of pipeline vs. Semgrep baseline (precision/recall/F1/noise
+- [x] **Step 4: Write `RESULTS.md`** — table of pipeline vs. Semgrep baseline (precision/recall/F1/noise
   ratio with raw counts), the failure-mode breakdown from Step 2, and an honest limitations section
   copied from `agent.md` §7. If the pipeline loses to the baseline, report that — it's still a result.
-- [ ] **Step 5: Commit** — `docs: benchmark results and failure analysis`
+- [x] **Step 5: Commit** — `docs: benchmark results and failure analysis`
 
 ---
 

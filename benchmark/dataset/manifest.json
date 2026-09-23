@@ -1,11 +1,173 @@
 [
   {
+    "id": "PYSEC-2021-317",
+    "repo": "python-pillow/Pillow",
+    "commit": "9e08eb8f78fdfd2f476e1b20b7cf38683754866b",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2021-317.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-23437",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2023-74",
+    "repo": "psf/requests",
+    "commit": "74ea7cf7a6a27a4eeb2ae24e162bcc942a6706d5",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-74.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-32681",
+    "category": ""
+  },
+  {
+    "id": "benign-6ade625848",
+    "repo": "django/django",
+    "commit": "6ade6258480fba84a7e895b4b1e1716dfc954778",
+    "diff_path": "benchmark/dataset/diffs/benign-6ade625848.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2023-62",
+    "repo": "pallets/flask",
+    "commit": "70f906c51ce49c485f1d355703e9cc3386b1cc2b",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-62.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-30861",
+    "category": ""
+  },
+  {
+    "id": "benign-7d67d37648",
+    "repo": "python-pillow/Pillow",
+    "commit": "7d67d3764871ebfb4cbbd04459eede0bbc37966e",
+    "diff_path": "benchmark/dataset/diffs/benign-7d67d37648.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "OSV-2022-715",
+    "repo": "python-pillow/Pillow",
+    "commit": "9887544fafcd13cc8afcfa0c6d0f2e6facc1a8b8",
+    "diff_path": "benchmark/dataset/diffs/OSV-2022-715.diff",
+    "is_vulnerable": true,
+    "cve_id": null,
+    "category": "Segv on unknown address in jpeg_read_scanlines"
+  },
+  {
+    "id": "PYSEC-2016-15",
+    "repo": "django/django",
+    "commit": "c5544d289233f501917e25970c03ed444abbd4f0",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2016-15.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2016-2512",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2022-304",
+    "repo": "django/django",
+    "commit": "5b6b257fa7ec37ff27965358800c67e2dd11c924",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2022-304.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-41323",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2016-2",
+    "repo": "django/django",
+    "commit": "d03bf6fe4e9bf5b07de62c1a271c4b41a7d3d158",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2016-2.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2016-6186",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2024-24",
+    "repo": "aio-libs/aiohttp",
+    "commit": "1c335944d6a8b1298baf179b7c0b3069f10c514b",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2024-24.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-23334",
+    "category": ""
+  },
+  {
+    "id": "benign-973540376e",
+    "repo": "python-pillow/Pillow",
+    "commit": "973540376e293b75381d04fe61f53daac3a665b8",
+    "diff_path": "benchmark/dataset/diffs/benign-973540376e.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-08ba4d0e0f",
+    "repo": "django/django",
+    "commit": "08ba4d0e0f62e322c6727596ee7a324465076a76",
+    "diff_path": "benchmark/dataset/diffs/benign-08ba4d0e0f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-82f34e2f72",
+    "repo": "django/django",
+    "commit": "82f34e2f7290d98ae2d1fe80919b2f0e21b18369",
+    "diff_path": "benchmark/dataset/diffs/benign-82f34e2f72.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-d0084ee4a2",
+    "repo": "python-imaging/Pillow",
+    "commit": "d0084ee4a2975b3fa1bf56e47df5d50ecd4765be",
+    "diff_path": "benchmark/dataset/diffs/benign-d0084ee4a2.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-3497f81087",
+    "repo": "aio-libs/aiohttp",
+    "commit": "3497f81087cc8dee900f22cc4c431ccba6aff419",
+    "diff_path": "benchmark/dataset/diffs/benign-3497f81087.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
     "id": "PYSEC-2025-61",
     "repo": "python-pillow/pillow",
     "commit": "89f1f4626a2aaf5f3d5ca6437f41def2998fbe09",
     "diff_path": "benchmark/dataset/diffs/PYSEC-2025-61.diff",
     "is_vulnerable": true,
     "cve_id": "CVE-2025-48379",
+    "category": ""
+  },
+  {
+    "id": "benign-935edaa91b",
+    "repo": "django/django",
+    "commit": "935edaa91b756325352ca70d5eba49a64b70d28c",
+    "diff_path": "benchmark/dataset/diffs/benign-935edaa91b.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-581deb9402",
+    "repo": "django/django",
+    "commit": "581deb9402edc70f85b63c170c199a393f0f2183",
+    "diff_path": "benchmark/dataset/diffs/benign-581deb9402.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2018-28",
+    "repo": "requests/requests",
+    "commit": "c45d7c49ea75133e52ab22a8e9e13173938e36ff",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2018-28.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2018-18074",
     "category": ""
   },
   {
@@ -16,5 +178,221 @@
     "is_vulnerable": false,
     "cve_id": null,
     "category": null
+  },
+  {
+    "id": "benign-2970eeef7c",
+    "repo": "python-pillow/Pillow",
+    "commit": "2970eeef7c88bcf05fe6a36bb780d79d396b4817",
+    "diff_path": "benchmark/dataset/diffs/benign-2970eeef7c.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-0449619777",
+    "repo": "python-pillow/Pillow",
+    "commit": "0449619777bd9b3b0df8930fb6d2588c435fc094",
+    "diff_path": "benchmark/dataset/diffs/benign-0449619777.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-5265459bd3",
+    "repo": "aio-libs/aiohttp",
+    "commit": "5265459bd350ff52887ad5d0ceeb984779d56dbe",
+    "diff_path": "benchmark/dataset/diffs/benign-5265459bd3.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "OSV-2022-1074",
+    "repo": "python-pillow/Pillow",
+    "commit": "f7363c1091c70356d92e56abfca6b65bef9e7b26",
+    "diff_path": "benchmark/dataset/diffs/OSV-2022-1074.diff",
+    "is_vulnerable": true,
+    "cve_id": null,
+    "category": "Invalid-free in _dealloc"
+  },
+  {
+    "id": "PYSEC-2020-78",
+    "repo": "python-pillow/Pillow",
+    "commit": "46f4a349b88915787fea3fb91348bb1665831bbb",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2020-78.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2020-10379",
+    "category": ""
+  },
+  {
+    "id": "benign-4b03987c4b",
+    "repo": "python-pillow/Pillow",
+    "commit": "4b03987c4baee912ab2ebd4c88abd027f480c25d",
+    "diff_path": "benchmark/dataset/diffs/benign-4b03987c4b.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2023-250",
+    "repo": "aio-libs/aiohttp",
+    "commit": "1e86b777e61cf4eefc7d92fa57fa19dcc676013b",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-250.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-49081",
+    "category": ""
+  },
+  {
+    "id": "benign-6f205ff422",
+    "repo": "requests/requests",
+    "commit": "6f205ff422bccd5e4c4fc0b64c5f3e7df5181db6",
+    "diff_path": "benchmark/dataset/diffs/benign-6f205ff422.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2023-247",
+    "repo": "aio-libs/aiohttp",
+    "commit": "f016f0680e4ace6742b03a70cb0382ce86abe371",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-247.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-47641",
+    "category": ""
+  },
+  {
+    "id": "benign-d13f288016",
+    "repo": "python-pillow/Pillow",
+    "commit": "d13f2880161689a05d9121edf0ddf8cbe116245a",
+    "diff_path": "benchmark/dataset/diffs/benign-d13f288016.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2021-76",
+    "repo": "aio-libs/aiohttp",
+    "commit": "2545222a3853e31ace15d87ae0e2effb7da0c96b",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2021-76.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-21330",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2023-227",
+    "repo": "python-pillow/Pillow",
+    "commit": "1fe1bb49c452b0318cad12ea9d97c3bef188e9a7",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-227.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-44271",
+    "category": ""
+  },
+  {
+    "id": "benign-2abf9d2cf8",
+    "repo": "django/django",
+    "commit": "2abf9d2cf8602f0ddc0db4ec1a33769b41b4232a",
+    "diff_path": "benchmark/dataset/diffs/benign-2abf9d2cf8.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-8dd3b26bf5",
+    "repo": "kennethreitz/requests",
+    "commit": "8dd3b26bf59808de24fd654699f592abf6de581e",
+    "diff_path": "benchmark/dataset/diffs/benign-8dd3b26bf5.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2015-17",
+    "repo": "kennethreitz/requests",
+    "commit": "3bd8afbff29e50b38f889b2f688785a669b9aafc",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2015-17.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2015-2296",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2014-22",
+    "repo": "python-imaging/Pillow",
+    "commit": "4e9f367dfd3f04c8f5d23f7f759ec12782e10ee7",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2014-22.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2014-1932",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2023-251",
+    "repo": "aio-libs/aiohttp",
+    "commit": "e4ae01c2077d2cfa116aa82e4ff6866857f7c466",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-251.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-49082",
+    "category": ""
+  },
+  {
+    "id": "benign-6f66281a1d",
+    "repo": "psf/requests",
+    "commit": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+    "diff_path": "benchmark/dataset/diffs/benign-6f66281a1d.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-a3f0642f69",
+    "repo": "django/django",
+    "commit": "a3f0642f69277f01611d0d3e829fc3b85aded2ec",
+    "diff_path": "benchmark/dataset/diffs/benign-a3f0642f69.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "benign-d73fa1cdcb",
+    "repo": "pallets/flask",
+    "commit": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+    "diff_path": "benchmark/dataset/diffs/benign-d73fa1cdcb.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2020-35",
+    "repo": "django/django",
+    "commit": "eb31d845323618d688ad429479c6dda973056136",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2020-35.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2020-7471",
+    "category": ""
+  },
+  {
+    "id": "PYSEC-2015-11",
+    "repo": "django/django",
+    "commit": "316bc3fc9437c5960c24baceb93c73f1939711e4",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2015-11.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2015-8213",
+    "category": ""
+  },
+  {
+    "id": "benign-3bc82f0e92",
+    "repo": "python-pillow/Pillow",
+    "commit": "3bc82f0e92180fd2bb44952ae6a181ea05fb1d02",
+    "diff_path": "benchmark/dataset/diffs/benign-3bc82f0e92.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null
+  },
+  {
+    "id": "PYSEC-2022-42980",
+    "repo": "python-pillow/Pillow",
+    "commit": "2444cddab2f83f28687c7c20871574acbb6dbcf3",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2022-42980.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-45199",
+    "category": ""
   }
 ]

@@ -104,7 +104,44 @@ def _strip_prefix(path: str) -> str:
     return path[2:] if path.startswith(("a/", "b/")) else path
 
 
+TEST_PATH = re.compile(r"(^|/)tests?/|(^|/)test_|_test\.", re.IGNORECASE)
+DOC_PATH = re.compile(r"(^|/)docs?/|\.(rst|md|txt|cfg|ini|toml|po)$", re.IGNORECASE)
+VERSION_PATH = re.compile(r"(^|/)_?version\.py$|(^|/)setup\.py$", re.IGNORECASE)
+
+
+def filter_to_source(diff_text: str) -> str:
+    """Keeps only production source files.
+
+    Positives are reversed fix commits, so their docs and test hunks read as "this PR deletes a
+    security regression test and a release note naming a CVE" — a giveaway that has nothing to do
+    with reviewing the code. Negatives get the same treatment so the two classes stay comparable.
+    """
+    sections = re.split(r"(?m)^(?=diff --git )", diff_text)
+    kept = [section for section in sections if section.strip() and _is_source_section(section)]
+    return "".join(kept)
+
+
+def _is_source_section(section: str) -> bool:
+    paths = [
+        line[4:].strip()
+        for line in section.splitlines()
+        if line.startswith("+++ ") or line.startswith("--- ")
+    ]
+    paths = [_strip_prefix(p) for p in paths if p != "/dev/null"]
+    if not paths:
+        return False
+    return any(
+        path.endswith(SUPPORTED_SUFFIXES)
+        and not TEST_PATH.search(path)
+        and not DOC_PATH.search(path)
+        and not VERSION_PATH.search(path)
+        for path in paths
+    )
+
+
 def is_reviewable_diff(diff_text: str) -> bool:
+    if not diff_text.strip():
+        return False
     lines = diff_text.splitlines()
     if len(lines) > MAX_DIFF_LINES:
         return False
@@ -261,8 +298,11 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
             continue
         diff = fetch_commit_diff(fix["repo"], fix["commit"])
         time.sleep(1)  # unauthenticated GitHub allows 60 requests/hour
-        if not diff or not is_reviewable_diff(diff):
+        if not diff:
             continue
+        diff = filter_to_source(diff)
+        if not is_reviewable_diff(diff):
+            continue  # release commits and docs-only fixes carry no vulnerability to find
 
         fix_shas.add(fix["commit"])
         repos_seen.append(fix["repo"])
@@ -294,7 +334,10 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
                 continue
             diff = fetch_commit_diff(repo, sha)
             time.sleep(1)
-            if not diff or not is_reviewable_diff(diff):
+            if not diff:
+                continue
+            diff = filter_to_source(diff)
+            if not is_reviewable_diff(diff):
                 continue
 
             name = f"benign-{sha[:10]}.diff"

@@ -4,6 +4,7 @@ import pytest
 
 from benchmark.build_dataset import (
     ManifestEntry,
+    filter_to_source,
     is_reviewable_diff,
     reverse_diff,
     select_candidates,
@@ -85,6 +86,59 @@ def test_accepts_small_python_diff():
 def test_rejects_oversized_diff():
     huge = FIX_DIFF + "".join(f"+line {i}\n" for i in range(500))
     assert not is_reviewable_diff(huge)
+
+
+# --- source filter: the label must not leak through docs or deleted tests ---
+
+MIXED_DIFF = """diff --git a/src/app/auth.py b/src/app/auth.py
+--- a/src/app/auth.py
++++ b/src/app/auth.py
+@@ -1,2 +1,2 @@
+-    if verify(token):
++    if token:
+diff --git a/tests/test_auth.py b/tests/test_auth.py
+--- a/tests/test_auth.py
++++ b/tests/test_auth.py
+@@ -1,2 +1,1 @@
+-def test_rejects_forged_token():
+-    assert not verify("forged")
+diff --git a/docs/releases/2.1.txt b/docs/releases/2.1.txt
+--- a/docs/releases/2.1.txt
++++ b/docs/releases/2.1.txt
+@@ -1,2 +1,1 @@
+-Fixed an authentication bypass (CVE-2024-1234).
+"""
+
+
+def test_keeps_source_files():
+    filtered = filter_to_source(MIXED_DIFF)
+    assert "src/app/auth.py" in filtered
+    assert "+    if token:" in filtered
+
+
+def test_drops_test_files_so_deleted_tests_do_not_give_the_answer_away():
+    assert "tests/test_auth.py" not in filter_to_source(MIXED_DIFF)
+
+
+def test_drops_release_notes_naming_the_cve():
+    filtered = filter_to_source(MIXED_DIFF)
+    assert "CVE-2024-1234" not in filtered
+    assert "docs/releases" not in filtered
+
+
+def test_returns_empty_when_only_metadata_changed():
+    version_bump = """diff --git a/src/PIL/_version.py b/src/PIL/_version.py
+--- a/src/PIL/_version.py
++++ b/src/PIL/_version.py
+@@ -1,1 +1,1 @@
+-__version__ = "11.3.0"
++__version__ = "11.3.0.dev0"
+"""
+    assert filter_to_source(version_bump) == ""
+
+
+def test_empty_filtered_diff_is_not_reviewable():
+    assert not is_reviewable_diff("")
 
 
 # --- candidate selection: one advisory can list several fix commits ---

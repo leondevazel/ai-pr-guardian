@@ -60,6 +60,23 @@ def _extract_json_array(raw: str) -> list:
     return parsed if isinstance(parsed, list) else []
 
 
+def _after_view(hunk) -> str:
+    """The hunk as the file will read after merging: context + added lines, numbered, no markers."""
+    lines, line_no = [], hunk.start_line
+    for raw_line in hunk.context.splitlines():
+        if raw_line.startswith("-"):
+            continue
+        lines.append(f"  {line_no}: {raw_line[1:] if raw_line[:1] in '+ ' else raw_line}")
+        line_no += 1
+    return "\n".join(lines)
+
+
+def _removed_lines(hunk) -> str:
+    return "\n".join(
+        f"  {raw_line[1:]}" for raw_line in hunk.context.splitlines() if raw_line.startswith("-")
+    )
+
+
 def _apply_adjustments(own: list[Finding], raw: str) -> list[Finding]:
     adjusted = list(own)
     for item in _extract_json_array(raw):
@@ -161,13 +178,30 @@ class ReviewAgent:
 
     @staticmethod
     def _render_diff(ctx: PRContext) -> str:
-        blocks = ["## Diff under review"]
+        """Shows the resulting code, then the change, instead of raw +/- markers.
+
+        Raw diffs caused the dominant false positive in the first benchmark run: agents read the
+        removed lines as code that still existed and reported the new line as unreachable or
+        duplicated. All three agents made the same mistake, so the rebuttal round could not catch
+        it — a shared misreading is invisible to peer review."""
+        blocks = [
+            "## Change under review",
+            "Below is the code AS IT WILL EXIST after this change is merged, followed by a summary "
+            "of what the change did. Lines listed as removed are GONE — they are shown only so you "
+            "understand the edit, and you must not reason about them as if they were still in the "
+            "file.",
+        ]
         for file in ctx.files:
             blocks.append(f"### {file.path}")
             for hunk in file.hunks:
-                numbered = "\n".join(f"{line_no}: {text}" for line_no, text in hunk.added_lines)
-                blocks.append(f"Added lines (line_number: code):\n{numbered}")
-                blocks.append(f"Full hunk with context:\n{hunk.context}")
+                blocks.append(f"Resulting code (line_number: code):\n{_after_view(hunk)}")
+
+                added = "\n".join(f"  {line_no}: {text}" for line_no, text in hunk.added_lines)
+                blocks.append(f"Lines this change ADDS:\n{added}" if added else "This hunk adds no lines.")
+
+                removed = _removed_lines(hunk)
+                if removed:
+                    blocks.append(f"Lines this change REMOVES (no longer present):\n{removed}")
         return "\n".join(blocks)
 
     @staticmethod

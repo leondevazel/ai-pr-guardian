@@ -10,7 +10,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 
-from benchmark.baselines import semgrep_baseline_on_added_lines
+from benchmark.baselines import semgrep_baseline_at
+from benchmark.build_dataset import GITHUB_API, _get
 from guardian.llm.client import AnthropicClient
 from guardian.models import Verdict
 from guardian.orchestrator import review_pr
@@ -49,8 +50,22 @@ def noise_ratio(verdicts: list[Verdict], labels: list[bool]) -> float:
     return sum(len(v.findings) for v in benign) / len(benign)
 
 
+def _post_change_ref(entry: dict) -> str:
+    """The commit whose tree matches what the reviewer is being asked to approve.
+
+    A positive example is a fix commit read backwards, so the state it produces is the fix's
+    parent — the code while it was still vulnerable. A benign example produces its own commit."""
+    if not entry["is_vulnerable"]:
+        return entry["commit"]
+
+    raw = _get(f"{GITHUB_API}/repos/{entry['repo']}/commits/{entry['commit']}")
+    parents = json.loads(raw).get("parents", [])
+    return parents[0]["sha"] if parents else entry["commit"]
+
+
 def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
     entries = json.loads(manifest_path.read_text(encoding="utf-8"))[:limit]
+    cache_dir = manifest_path.parent / "files"
     client = AnthropicClient()
 
     labels, pipeline_predictions, pipeline_verdicts = [], [], []
@@ -61,9 +76,11 @@ def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
         diff_text = Path(entry["diff_path"]).read_text(encoding="utf-8")
         print(f"[{i}/{len(entries)}] {entry['id']} (vulnerable={entry['is_vulnerable']})")
 
-        # No repo checkout: the agents see the diff, Semgrep sees the added lines.
+        # The agents see only the diff; Semgrep gets the whole post-change file (baselines.py).
         verdict = review_pr(repo_path=".", diff_text=diff_text, client=client, run_semgrep=lambda *_: [])
-        baseline_decision, baseline_count = semgrep_baseline_on_added_lines(diff_text)
+        baseline_decision, baseline_count = semgrep_baseline_at(
+            entry["repo"], _post_change_ref(entry), diff_text, cache_dir
+        )
 
         labels.append(bool(entry["is_vulnerable"]))
         pipeline_predictions.append(verdict.decision)

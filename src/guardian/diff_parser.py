@@ -17,7 +17,15 @@ def parse_diff(diff_text: str) -> PRContext:
                     for line in hunk
                     if line.is_added
                 ],
-                context="".join(line.value for line in hunk),
+                removed_lines=[
+                    (line.source_line_no, line.value.rstrip("\n"))
+                    for line in hunk
+                    if line.is_removed
+                ],
+                # Markers are kept. unidiff's line.value omits them, and joining bare values
+                # produced a blob where deleted code read as if it still ran right before the
+                # new code — which is what made agents report imaginary unreachable branches.
+                context="".join(line.line_type + line.value for line in hunk),
             )
             for hunk in patched_file
         ]

@@ -10,6 +10,7 @@ class Hunk:
     start_line: int
     added_lines: list[tuple[int, str]]
     context: str
+    removed_lines: list[tuple[int, str]] = field(default_factory=list)
 
 
 @dataclass

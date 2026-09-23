@@ -1,0 +1,135 @@
+"""Scores the pipeline against the labeled benchmark, next to the Semgrep baseline.
+
+Raw counts are reported alongside percentages: with a 50-example set, "80% precision" without
+"4 of 5" behind it is not a number anyone should trust (agent.md §7).
+"""
+
+import argparse
+import json
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+
+from benchmark.baselines import semgrep_baseline_on_added_lines
+from guardian.llm.client import AnthropicClient
+from guardian.models import Verdict
+from guardian.orchestrator import review_pr
+
+FLAGGED = {"block", "request_changes"}
+
+
+@dataclass
+class Metrics:
+    precision: float
+    recall: float
+    f1: float
+    tp: int
+    fp: int
+    tn: int
+    fn: int
+
+
+def score(predictions: list[str], labels: list[bool]) -> Metrics:
+    tp = sum(1 for p, y in zip(predictions, labels) if p in FLAGGED and y)
+    fp = sum(1 for p, y in zip(predictions, labels) if p in FLAGGED and not y)
+    fn = sum(1 for p, y in zip(predictions, labels) if p not in FLAGGED and y)
+    tn = sum(1 for p, y in zip(predictions, labels) if p not in FLAGGED and not y)
+
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+
+    return Metrics(precision, recall, f1, tp, fp, tn, fn)
+
+
+def noise_ratio(verdicts: list[Verdict], labels: list[bool]) -> float:
+    benign = [v for v, y in zip(verdicts, labels) if not y]
+    if not benign:
+        return 0.0
+    return sum(len(v.findings) for v in benign) / len(benign)
+
+
+def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
+    entries = json.loads(manifest_path.read_text(encoding="utf-8"))[:limit]
+    client = AnthropicClient()
+
+    labels, pipeline_predictions, pipeline_verdicts = [], [], []
+    baseline_predictions, baseline_finding_counts = [], []
+    per_example = []
+
+    for i, entry in enumerate(entries, 1):
+        diff_text = Path(entry["diff_path"]).read_text(encoding="utf-8")
+        print(f"[{i}/{len(entries)}] {entry['id']} (vulnerable={entry['is_vulnerable']})")
+
+        # No repo checkout: the agents see the diff, Semgrep sees the added lines.
+        verdict = review_pr(repo_path=".", diff_text=diff_text, client=client, run_semgrep=lambda *_: [])
+        baseline_decision, baseline_count = semgrep_baseline_on_added_lines(diff_text)
+
+        labels.append(bool(entry["is_vulnerable"]))
+        pipeline_predictions.append(verdict.decision)
+        pipeline_verdicts.append(verdict)
+        baseline_predictions.append(baseline_decision)
+        baseline_finding_counts.append(baseline_count)
+
+        per_example.append(
+            {
+                "id": entry["id"],
+                "is_vulnerable": entry["is_vulnerable"],
+                "pipeline": verdict.decision,
+                "pipeline_findings": [asdict(f) for f in verdict.findings],
+                "rationale": verdict.rationale,
+                "baseline": baseline_decision,
+                "baseline_findings": baseline_count,
+            }
+        )
+
+    benign_baseline_counts = [c for c, y in zip(baseline_finding_counts, labels) if not y]
+    results = {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "n_examples": len(entries),
+        "pipeline": asdict(score(pipeline_predictions, labels)),
+        "baseline": asdict(score(baseline_predictions, labels)),
+        "pipeline_noise_ratio": round(noise_ratio(pipeline_verdicts, labels), 3),
+        "baseline_noise_ratio": round(
+            sum(benign_baseline_counts) / len(benign_baseline_counts), 3
+        )
+        if benign_baseline_counts
+        else 0.0,
+        "cost_usd": round(client.total_cost_usd(), 4),
+        "examples": per_example,
+    }
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{datetime.now():%Y%m%d-%H%M%S}.json"
+    out_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
+    _print_summary(results, out_path)
+    return results
+
+
+def _print_summary(results: dict, out_path: Path) -> None:
+    p, b = results["pipeline"], results["baseline"]
+    print(f"\n{'':<12}{'precision':>11}{'recall':>9}{'f1':>8}{'tp':>5}{'fp':>5}{'fn':>5}{'tn':>5}")
+    for name, m in (("pipeline", p), ("semgrep", b)):
+        print(
+            f"{name:<12}{m['precision']:>11.2f}{m['recall']:>9.2f}{m['f1']:>8.2f}"
+            f"{m['tp']:>5}{m['fp']:>5}{m['fn']:>5}{m['tn']:>5}"
+        )
+    print(
+        f"\nfindings per benign PR — pipeline {results['pipeline_noise_ratio']}, "
+        f"semgrep {results['baseline_noise_ratio']}"
+    )
+    print(f"cost ${results['cost_usd']}   results: {out_path}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="score the pipeline against the benchmark")
+    parser.add_argument("--manifest", default="benchmark/dataset/manifest.json")
+    parser.add_argument("--limit", type=int, default=None, help="only the first N examples")
+    parser.add_argument("--out", default="benchmark/results")
+    args = parser.parse_args()
+
+    run(Path(args.manifest), args.limit, Path(args.out))
+
+
+if __name__ == "__main__":
+    main()

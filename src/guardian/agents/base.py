@@ -76,10 +76,10 @@ class ReviewAgent:
     def __init__(self, client):
         self.client = client
 
-    def review(self, ctx: PRContext, tools: list[ToolFinding]) -> list[Finding]:
+    def review(self, ctx: PRContext, tools: list[ToolFinding], contexts=()) -> list[Finding]:
         raw = self.client.complete(
             system=self._system_prompt(),
-            user=self._user_prompt(ctx, tools),
+            user=self._user_prompt(ctx, tools, contexts),
             model=self.model,
         )
         return parse_findings(raw, agent=self.name)
@@ -95,10 +95,13 @@ class ReviewAgent:
             f"{OUTPUT_CONTRACT}"
         )
 
-    def _user_prompt(self, ctx: PRContext, tools: list[ToolFinding]) -> str:
-        return "\n\n".join([self._render_diff(ctx), self._render_tools(tools), *self._extra_context(ctx)])
+    def _user_prompt(self, ctx: PRContext, tools: list[ToolFinding], contexts=()) -> str:
+        return "\n\n".join(
+            [self._render_diff(ctx), self._render_tools(tools), *self._extra_context(contexts)]
+        )
 
-    def _extra_context(self, ctx: PRContext) -> list[str]:
+    def _extra_context(self, contexts) -> list[str]:
+        """Each agent pulls only the slice of repo context its mandate needs (agent.md §2)."""
         return []
 
     @staticmethod

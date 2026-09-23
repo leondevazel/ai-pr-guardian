@@ -60,6 +60,19 @@ def _extract_json_array(raw: str) -> list:
     return parsed if isinstance(parsed, list) else []
 
 
+def _apply_adjustments(own: list[Finding], raw: str) -> list[Finding]:
+    adjusted = list(own)
+    for item in _extract_json_array(raw):
+        if not isinstance(item, dict):
+            continue
+        index = item.get("index")
+        if not isinstance(index, int) or isinstance(index, bool) or not 0 <= index < len(adjusted):
+            continue
+        if "confidence" in item:
+            adjusted[index].confidence = _clamp(item["confidence"])
+    return adjusted
+
+
 def _clamp(value) -> float:
     try:
         return max(0.0, min(1.0, float(value)))
@@ -83,6 +96,48 @@ class ReviewAgent:
             model=self.model,
         )
         return parse_findings(raw, agent=self.name)
+
+    def rebut(self, own: list[Finding], peers: list[Finding]) -> list[Finding]:
+        """Round 2: adjust confidence in your own findings after seeing peers' (agent.md §4).
+
+        Only confidence moves — no new findings, no re-sending the diff. Keeps the round cheap."""
+        if not own:
+            return []
+
+        raw = self.client.complete(
+            system=self._rebuttal_system_prompt(),
+            user=self._rebuttal_user_prompt(own, peers),
+            model=self.model,
+        )
+        return _apply_adjustments(own, raw)
+
+    def _rebuttal_system_prompt(self) -> str:
+        return (
+            f"You are the {self.name} reviewer, now in the REBUTTAL round.\n"
+            "You are shown your own findings and those of the other reviewers. For each of YOUR "
+            "findings, decide whether a peer's finding makes you more or less confident — a peer "
+            "explaining the same line differently is a reason to reconsider, not to dig in.\n"
+            "You may not add findings or change anything but your own confidence.\n\n"
+            'Respond with JSON and nothing else: [{"index": int, "confidence": float, '
+            '"rebuttal": "<one sentence, or empty>"}]\n'
+            "Omit findings you are not changing."
+        )
+
+    @staticmethod
+    def _rebuttal_user_prompt(own: list[Finding], peers: list[Finding]) -> str:
+        own_block = "\n".join(
+            f"[{i}] {f.file}:{f.line} severity={f.severity} confidence={f.confidence:.2f} "
+            f"({f.category}) {f.claim}"
+            for i, f in enumerate(own)
+        )
+        if peers:
+            peer_block = "\n".join(
+                f"- {f.agent} on {f.file}:{f.line} ({f.category}, confidence {f.confidence:.2f}): {f.claim}"
+                for f in peers
+            )
+        else:
+            peer_block = "(no overlapping findings from other reviewers)"
+        return f"## Your findings\n{own_block}\n\n## Other reviewers on the same lines\n{peer_block}"
 
     def _system_prompt(self) -> str:
         return (

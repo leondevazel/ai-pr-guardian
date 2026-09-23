@@ -1,5 +1,27 @@
-from benchmark.evaluate import noise_ratio, score
+from benchmark.evaluate import noise_ratio, score, security_only_decision
 from guardian.models import Finding, Verdict
+
+
+def sec_verdict(*findings):
+    return Verdict(decision="block", findings=list(findings), rationale="")
+
+
+def f(agent, severity="block", confidence=0.9):
+    return Finding(agent, "a.py", 1, severity, "cat", "claim", "evidence", confidence)
+
+
+def test_security_only_ignores_architecture_findings():
+    # The label is "contains a known vulnerability", so an architecture finding can only ever
+    # score as a false positive; the security-only view keeps the two questions apart.
+    assert security_only_decision(sec_verdict(f("architecture"))) == "approve"
+
+
+def test_security_only_keeps_security_findings():
+    assert security_only_decision(sec_verdict(f("security"))) == "block"
+
+
+def test_security_only_applies_the_same_thresholds():
+    assert security_only_decision(sec_verdict(f("security", confidence=0.69))) == "approve"
 
 
 def verdict(decision, n_findings=0):

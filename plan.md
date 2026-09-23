@@ -132,15 +132,15 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Produces: `parse_findings(raw: str, agent: str) -> list[Finding]` in `base.py` — drops any finding
   missing `file`/`line` or with malformed JSON, never raises
 
-- [ ] **Step 1: Write failing tests** — feed `parse_findings` (a) well-formed JSON → 2 findings,
+- [x] **Step 1: Write failing tests** — feed `parse_findings` (a) well-formed JSON → 2 findings,
   (b) JSON with one finding missing `line` → that one dropped, (c) non-JSON garbage → empty list.
   Then test `review()` with a fake client injected, asserting it returns parsed findings.
-- [ ] **Step 2: Run, verify fail**
-- [ ] **Step 3: Implement.** System prompt states the mandate and the "must NOT" line from `agent.md`
+- [x] **Step 2: Run, verify fail**
+- [x] **Step 3: Implement.** System prompt states the mandate and the "must NOT" line from `agent.md`
   §2 verbatim, demands JSON array output matching the `Finding` schema, and requires `evidence` to be
   a literal quote from the diff. Model: Haiku.
-- [ ] **Step 4: Run, verify pass**
-- [ ] **Step 5: Commit** — `feat: add LLM client seam and SecurityAgent`
+- [x] **Step 4: Run, verify pass**
+- [x] **Step 5: Commit** — `feat: add LLM client seam and SecurityAgent`
 
 ### Task 5: ArchitectureAgent + BusinessLogicAgent
 
@@ -148,14 +148,14 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Create: `src/guardian/agents/architecture.py`, `src/guardian/agents/business_logic.py`
 - Test: `tests/test_agents.py`
 
-- [ ] **Step 1: Write failing tests** — each agent, with a fake client, returns parsed findings and
+- [x] **Step 1: Write failing tests** — each agent, with a fake client, returns parsed findings and
   tags `finding.agent` with its own name.
-- [ ] **Step 2: Run, verify fail**
-- [ ] **Step 3: Implement** both as subclasses of the Task-4 base; only the system prompt and the
+- [x] **Step 2: Run, verify fail**
+- [x] **Step 3: Implement** both as subclasses of the Task-4 base; only the system prompt and the
   context they request differ (Architecture gets imports + file tree, BusinessLogic gets enclosing
   function + related tests — per `agent.md` §2).
-- [ ] **Step 4: Run, verify pass**
-- [ ] **Step 5: Commit** — `feat: add architecture and business-logic reviewer agents`
+- [x] **Step 4: Run, verify pass**
+- [x] **Step 5: Commit** — `feat: add architecture and business-logic reviewer agents`
 
 ### Task 6: Orchestrator (3 rounds) + verdict rule + cost meter
 
@@ -169,18 +169,18 @@ def test_captures_added_lines_with_absolute_line_numbers():
 - Produces: `decide(findings: list[Finding]) -> Literal["approve","request_changes","block"]` — pure
   function implementing `agent.md` §4's threshold rule
 
-- [ ] **Step 1: Write failing tests** for `decide()` first (pure, no LLM): block finding at 0.7 → block;
+- [x] **Step 1: Write failing tests** for `decide()` first (pure, no LLM): block finding at 0.7 → block;
   block finding at 0.69 → falls through to warn rules; warn at 0.5 → request_changes; nothing → approve.
   Then an end-to-end `review_pr` test with a fake client scripted for all three rounds, asserting
   Round 2 prompts contain other agents' findings and that findings lacking `line` never reach the chief.
-- [ ] **Step 2: Run, verify fail**
-- [ ] **Step 3: Implement** rounds per `agent.md` §4 — Round 1 agents in parallel
+- [x] **Step 2: Run, verify fail**
+- [x] **Step 3: Implement** rounds per `agent.md` §4 — Round 1 agents in parallel
   (`concurrent.futures.ThreadPoolExecutor`), Round 2 rebuttals (findings text only, no diff re-send),
   Round 3 chief pass on Sonnet. Log per-call token usage to `runs/<timestamp>.json`.
-- [ ] **Step 4: Run, verify pass**
+- [x] **Step 4: Run, verify pass**
 - [ ] **Step 5: Measure real cost** — run the CLI against the Task-1 fixture diff with real API keys
   once; confirm total cost < $0.15 and record it in `runs/`. If over, cut Round 2 context first.
-- [ ] **Step 6: Commit** — `feat: orchestrate 3-round review with deterministic verdict rule`
+- [x] **Step 6: Commit** — `feat: orchestrate 3-round review with deterministic verdict rule`
 
 ---
 

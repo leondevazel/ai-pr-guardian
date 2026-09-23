@@ -54,8 +54,16 @@ Agents don't detect vulnerabilities from scratch — that's what makes this trac
 consume the output of real static analyzers and reason about *relevance*, not perform pattern
 matching an LLM is bad at anyway.
 
-- `tools/semgrep_runner.py` — runs `semgrep --config=p/security-audit` (or Bandit for Python-only
-  repos) on the changed files, parses JSON output into `ToolFindings`.
+- `tools/semgrep_runner.py` — runs `semgrep` with `p/security-audit` + `p/python` on the changed
+  files, parses JSON output into `ToolFindings`.
+
+  **Measured coverage (2026-09-23, semgrep 1.177.0):** on a probe file, the free rulesets caught
+  `subprocess(shell=True)` (ERROR), `eval()` (WARNING), and MD5 hashing (WARNING) — but **missed an
+  f-string SQL injection** (`conn.execute(f"SELECT ... {user_id}")`) and a hardcoded password.
+  This matters for the thesis: Semgrep is a *precision anchor*, not the recall source. The LLM
+  agents must review the raw diff on their own, not merely triage tool output — which is why every
+  agent receives the diff itself (§2), not just `ToolFindings`. Recall contribution *beyond* Semgrep
+  is therefore a headline metric, not a footnote (§5).
 - `tools/repo_context.py` — given a file path, returns: surrounding function, its existing tests (by
   grepping `test_*` files that import/reference the changed symbol), and the import graph one hop out.
 

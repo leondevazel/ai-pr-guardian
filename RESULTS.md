@@ -73,6 +73,19 @@ Two full runs ($1.90) produced no usable score. They produced this instead, whic
 3. **Run-to-run variance was never measured.** The first comparison (0.65 → 0.55) was read as a
    regression. It was noise, as the 0.55/0.67/0.72 spread on identical code later showed.
 
+## Next: a larger benchmark, built but not yet scored
+
+A v2 dataset now exists: **198 examples from 57 repositories, half Python and half JavaScript**,
+split by id hash into dev (86) and test (112), each class-balanced. The evaluator reports 95%
+bootstrap confidence intervals and resumes after interruption. Two changes to the construction
+came out of auditing it: fix commits are taken from advisory references (the actual patch)
+rather than version-bump release commits, and CVE/GHSA identifiers are redacted from diffs after
+three positives were found deleting a comment that named their own advisory.
+
+It has not been scored yet — a full dev/test pass costs roughly $20 in API calls, and was deferred.
+The numbers above are from the 38-example v1 set. The plan when it is run: tune the security
+reviewer's recall on dev only, then open test once for the reported number.
+
 ## Limitations
 
 - **n = 38.** Every percentage here rests on single-digit counts; that is why raw counts are printed

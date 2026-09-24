@@ -45,6 +45,20 @@ review spam. The workflow runs on `pull_request`, not `pull_request_target`: the
 secrets to code a fork controls, and a security tool does not get to be the hole. Fork PRs are
 therefore not reviewed automatically.
 
+## Web playground
+
+`web/` is a small site where anyone can paste a diff or a public PR link and watch the three
+reviewers fill in live, with each finding marked in the margin of the line it names. Visitors can
+vote on findings; votes are stored as labels for future benchmarks. A per-visitor limit and a
+$1/day site budget cap spend on the owner's API key.
+
+```bash
+pip install fastapi uvicorn
+PYTHONPATH=src uvicorn web.app:app --port 8765
+```
+
+A `Dockerfile` is included for hosting (it leaves Semgrep out: the site reviews diffs only).
+
 ## Benchmark
 
 ```bash

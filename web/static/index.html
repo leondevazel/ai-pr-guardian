@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PR Guardian</title>
+<meta name="description" content="Three AI reviewers read your diff, argue, and only security findings can block the merge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDEFF2;
+    --sheet: #FFFFFF;
+    --ink: #1B2230;
+    --ink-soft: #4A5468;
+    --rule: #C9CED6;
+    --red: #C8102E;
+    --red-wash: #FBE9EC;
+    --ochre: #A86B12;
+    --ochre-wash: #FBF2E2;
+    --green: #2F7D6D;
+    --green-wash: #E5F2EF;
+    --sans: "Schibsted Grotesk", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 var(--sans); }
+  a { color: inherit; text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  button { font: inherit; cursor: pointer; }
+
+  header {
+    max-width: 1280px; margin: 0 auto; padding: 28px 24px 12px;
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px;
+  }
+  h1 { margin: 0; font-weight: 900; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.02em; line-height: 1.05; }
+  .tagline { margin: 6px 0 0; color: var(--ink-soft); max-width: 62ch; }
+  nav { display: flex; gap: 20px; font-weight: 500; }
+
+  main {
+    max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px;
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 24px; align-items: start;
+  }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+  .sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; }
+
+  /* ---------- the manuscript (diff) ---------- */
+  .manuscript { position: sticky; top: 16px; display: flex; flex-direction: column; min-height: 520px; }
+  @media (max-width: 900px) { .manuscript { position: static; } }
+  .source-tabs { display: flex; border-bottom: 1px solid var(--rule); }
+  .source-tabs button {
+    background: none; border: 0; padding: 12px 16px; color: var(--ink-soft); font-weight: 500;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .source-tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+  textarea, input[type=url] {
+    width: 100%; border: 0; resize: vertical; padding: 16px; font: 13px/1.6 var(--mono); color: var(--ink);
+    background: transparent;
+  }
+  textarea { min-height: 380px; flex: 1; }
+  input[type=url] { font-family: var(--sans); font-size: 15px; }
+  .actions { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
+  .primary {
+    background: var(--ink); color: #fff; border: 0; border-radius: 3px; padding: 10px 18px; font-weight: 700;
+  }
+  .primary:disabled { opacity: 0.45; cursor: progress; }
+  .quiet { background: none; border: 0; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; padding: 4px 0; }
+  .note { color: var(--ink-soft); font-size: 13px; margin-left: auto; }
+
+  .diff { font: 13px/1.65 var(--mono); overflow: auto; flex: 1; max-height: 70vh; }
+  .diff .file { padding: 10px 16px 4px; font-family: var(--sans); font-weight: 700; font-size: 13px; border-top: 1px solid var(--rule); }
+  .diff .file:first-child { border-top: 0; }
+  .line { display: grid; grid-template-columns: 14px 44px minmax(0, 1fr); white-space: pre; }
+  .line .mark { position: relative; }
+  .line .no { color: #98A0AE; text-align: right; padding-right: 10px; user-select: none; }
+  .line .code { padding-right: 16px; }
+  .line.add { background: #F3F6F4; }
+  .line.del { color: #98A0AE; text-decoration: line-through; text-decoration-color: #C9CED6; }
+  .line.hunk { color: var(--ink-soft); background: #F6F7F9; }
+  /* the red pen: a stroke drawn down the margin when a reviewer lands on this line */
+  .line.flag-security .mark::after, .line.flag-advisory .mark::after {
+    content: ""; position: absolute; left: 5px; top: 2px; bottom: 2px; width: 3px; border-radius: 2px;
+    transform-origin: top; animation: stroke 380ms ease-out both;
+  }
+  .line.flag-security { background: var(--red-wash); }
+  .line.flag-security .mark::after { background: var(--red); }
+  .line.flag-advisory:not(.flag-security) { background: var(--ochre-wash); }
+  /* When both tiers land on a line, the red pen wins: that line can block the merge. */
+  .line.flag-advisory:not(.flag-security) .mark::after { background: var(--ochre); }
+  @keyframes stroke { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+  /* ---------- the board ---------- */
+  .board { display: flex; flex-direction: column; gap: 16px; }
+  .stages { display: flex; gap: 0; list-style: none; margin: 0; padding: 0; }
+  .stages li {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink-soft);
+    font-size: 14px; font-weight: 500;
+  }
+  .stages li + li { border-left: 0; }
+  @media (max-width: 620px) { .stages li { padding: 8px; font-size: 13px; line-height: 1.3; } }
+  .stages li[data-state="active"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--ink); }
+  .stages li[data-state="done"] { color: var(--ink); }
+  .stages li[data-state="done"]::before { content: "✓ "; }
+
+  .reviewers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 620px) { .reviewers { grid-template-columns: 1fr; } }
+  .reviewer { padding: 14px; min-height: 150px; }
+  .reviewer h3 { margin: 0; font-size: 15px; }
+  .reviewer .role { margin: 2px 0 10px; font-size: 13px; color: var(--ink-soft); }
+  .reviewer .power { font-size: 12px; font-weight: 700; }
+  .reviewer[data-agent="security"] .power { color: var(--red); }
+  .reviewer:not([data-agent="security"]) .power { color: var(--ochre); }
+  .reviewer .status { font-size: 13px; color: var(--ink-soft); }
+  .reviewer.thinking .status::after { content: "…"; animation: blink 1.2s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .pin { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--rule); font-size: 13px; }
+  .pin .where { font-family: var(--mono); font-size: 12px; }
+  .pin .conf s { color: #98A0AE; margin-right: 4px; }
+
+  .verdict { padding: 20px; }
+  .verdict[hidden] { display: none; }
+  .verdict h2 { margin: 0 0 6px; font-size: 26px; font-weight: 900; letter-spacing: -0.01em; }
+  .verdict.block h2 { color: var(--red); }
+  .verdict.approve h2 { color: var(--green); }
+  .verdict.request_changes h2 { color: var(--ochre); }
+  .verdict .why { margin: 0 0 16px; color: var(--ink-soft); max-width: 68ch; }
+  .verdict h4 { margin: 18px 0 6px; font-size: 14px; }
+  .finding { border-left: 3px solid var(--red); padding: 8px 0 8px 12px; margin: 8px 0; }
+  .finding.advisory { border-left-color: var(--ochre); }
+  .finding .head { font-weight: 700; }
+  .finding .where { font-family: var(--mono); font-size: 13px; font-weight: 400; }
+  .finding p { margin: 4px 0; }
+  .finding pre { margin: 6px 0; padding: 8px 10px; background: var(--paper); font: 12px/1.5 var(--mono); overflow-x: auto; white-space: pre-wrap; }
+  .vote { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .vote button { border: 1px solid var(--rule); background: var(--sheet); border-radius: 3px; padding: 3px 10px; font-size: 13px; }
+  .vote button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .cost { margin-top: 16px; font-size: 13px; color: var(--ink-soft); }
+
+  .error { padding: 14px 16px; border-left: 3px solid var(--red); background: var(--red-wash); }
+  .error[hidden] { display: none; }
+
+  footer {
+    max-width: 1280px; margin: 0 auto; padding: 0 24px 40px; color: var(--ink-soft); font-size: 14px;
+  }
+  footer p { max-width: 80ch; margin: 0 0 8px; }
+
+  /* A reviewer must see the characters that are there: no "->" drawn as an arrow. Last in the
+     sheet on purpose — any later `font` shorthand would reset it to normal. */
+  textarea, .diff, .diff *, pre, .where { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>PR Guardian</h1>
+    <p class="tagline">Three reviewers read the same diff, argue about it, and a chief reviewer keeps what matters. Only security findings can block a merge.</p>
+  </div>
+  <nav>
+    <a href="https://github.com/leondevazel/ai-pr-guardian">Source</a>
+    <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">How well it works</a>
+  </nav>
+</header>
+
+<main>
+  <section class="sheet manuscript" aria-label="Code to review">
+    <div class="source-tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-source="diff">Paste a diff</button>
+      <button role="tab" aria-selected="false" data-source="pr">Link a GitHub PR</button>
+    </div>
+    <textarea id="diff-input" spellcheck="false" aria-label="Unified diff" placeholder="Paste the output of `git diff` here, or load the example."></textarea>
+    <input id="pr-input" type="url" hidden aria-label="Pull request URL" placeholder="https://github.com/owner/repo/pull/123">
+    <div id="diff-view" class="diff" hidden></div>
+    <div class="actions">
+      <button id="review" class="primary">Review</button>
+      <button id="example" class="quiet">Load the example</button>
+      <button id="edit" class="quiet" hidden>Edit the diff</button>
+      <span class="note">Public repos only. Up to 400 lines.</span>
+    </div>
+  </section>
+
+  <section class="board" aria-label="Review board" aria-live="polite">
+    <ol class="stages">
+      <li data-stage="round1">1. Independent review</li>
+      <li data-stage="rebuttal">2. Rebuttal</li>
+      <li data-stage="chief">3. Chief's verdict</li>
+    </ol>
+
+    <div class="reviewers">
+      <article class="sheet reviewer" data-agent="security">
+        <h3>Security</h3>
+        <p class="role">Injection, auth bypass, secrets, traversal</p>
+        <div class="power">Can block the merge</div>
+        <div class="pins"></div>
+        <p class="status">Waiting for a diff</p>
+      </article>
+      <article class="sheet reviewer" data-agent="architecture">
+        <h3>Architecture</h3>
+        <p class="role">Breaking changes, layering, lost errors</p>
+        <div class="power">Advises only</div>
+        <div class="pins"></div>
+        <p class="status">Waiting for a diff</p>
+      </article>
+      <article class="sheet reviewer" data-agent="business_logic">
+        <h3>Business logic</h3>
+        <p class="role">Boundaries, conditionals, None cases</p>
+        <div class="power">Advises only</div>
+        <div class="pins"></div>
+        <p class="status">Waiting for a diff</p>
+      </article>
+    </div>
+
+    <div id="error" class="error" role="alert" hidden></div>
+    <section id="verdict" class="sheet verdict" hidden></section>
+  </section>
+</main>
+
+<footer>
+  <p>On a benchmark built from real CVE fix commits, the security reviewer's blocking findings were right every time (6 of 6) but it caught about a third of the vulnerabilities. The other two reviewers catch far more and are wrong far more, which is why they only advise. Full numbers and limits are in <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">RESULTS.md</a>.</p>
+  <p>Your votes on findings are stored with the review so the next benchmark can use them. Diffs you submit are sent to Anthropic's API for review.</p>
+</footer>
+
+<script>
+const EXAMPLE = `diff --git a/demo/export.py b/demo/export.py
+new file mode 100644
+--- /dev/null
++++ b/demo/export.py
+@@ -0,0 +1,22 @@
++import os
++import sqlite3
++
++REPORT_DIR = "/srv/reports"
++PAGE_SIZE = 20
++
++
++def get_invoice(conn: sqlite3.Connection, invoice_id: str):
++    query = f"SELECT * FROM invoices WHERE id = '{invoice_id}'"
++    return conn.execute(query).fetchone()
++
++
++def download_report(name: str) -> bytes:
++    path = os.path.join(REPORT_DIR, name)
++    with open(path, "rb") as handle:
++        return handle.read()
++
++
++def page_of(items: list, page: int) -> list:
++    start = page * PAGE_SIZE
++    return items[start : start + PAGE_SIZE - 1]
++
+`;
+
+const $ = (s, root = document) => root.querySelector(s);
+const diffInput = $("#diff-input"), prInput = $("#pr-input"), diffView = $("#diff-view");
+const reviewBtn = $("#review"), editBtn = $("#edit"), exampleBtn = $("#example");
+const verdictEl = $("#verdict"), errorEl = $("#error");
+let source = "diff";
+const confidences = {}; // agent|file|line -> last confidence shown
+
+document.querySelectorAll(".source-tabs button").forEach(tab => tab.addEventListener("click", () => {
+  source = tab.dataset.source;
+  document.querySelectorAll(".source-tabs button").forEach(t => t.setAttribute("aria-selected", t === tab));
+  diffInput.hidden = source !== "diff" || !diffView.hidden;
+  prInput.hidden = source !== "pr";
+  exampleBtn.hidden = source !== "diff";
+}));
+
+exampleBtn.addEventListener("click", () => { diffInput.value = EXAMPLE; diffInput.focus(); });
+editBtn.addEventListener("click", () => showInput());
+
+function showInput() {
+  diffView.hidden = true; editBtn.hidden = true;
+  diffInput.hidden = source !== "diff"; prInput.hidden = source !== "pr";
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// Render the diff with new-file line numbers so findings can be pinned to their lines.
+function renderDiff(text) {
+  let file = "", newLine = 0, html = "";
+  for (const raw of text.split("\n")) {
+    if (raw.startsWith("diff --git") || raw.startsWith("index ") || raw.startsWith("new file") || raw.startsWith("--- ")) continue;
+    if (raw.startsWith("+++ ")) {
+      file = raw.slice(4).replace(/^b\//, "");
+      html += `<div class="file">${escapeHtml(file)}</div>`;
+      continue;
+    }
+    const hunk = raw.match(/^@@ -\d+(?:,\d+)? \+(\d+)/);
+    if (hunk) {
+      newLine = parseInt(hunk[1], 10);
+      html += `<div class="line hunk"><span class="mark"></span><span class="no"></span><span class="code">${escapeHtml(raw)}</span></div>`;
+      continue;
+    }
+    if (raw.startsWith("-")) {
+      html += `<div class="line del"><span class="mark"></span><span class="no"></span><span class="code">${escapeHtml(raw.slice(1))}</span></div>`;
+    } else if (raw.startsWith("+") || raw.startsWith(" ")) {
+      const kind = raw.startsWith("+") ? "add" : "ctx";
+      html += `<div class="line ${kind}" data-file="${escapeHtml(file)}" data-line="${newLine}"><span class="mark"></span><span class="no">${newLine}</span><span class="code">${escapeHtml(raw.slice(1))}</span></div>`;
+      newLine++;
+    }
+  }
+  diffView.innerHTML = html;
+  diffInput.hidden = true; prInput.hidden = true; diffView.hidden = false; editBtn.hidden = false;
+}
+
+function flagLine(file, line, agent) {
+  const row = diffView.querySelector(`.line[data-file="${CSS.escape(file)}"][data-line="${line}"]`);
+  if (row) row.classList.add(agent === "security" ? "flag-security" : "flag-advisory");
+}
+
+function setStage(stage) {
+  const order = ["round1", "rebuttal", "chief"];
+  document.querySelectorAll(".stages li").forEach(li => {
+    const i = order.indexOf(li.dataset.stage), current = order.indexOf(stage);
+    li.dataset.state = i < current ? "done" : i === current ? "active" : "";
+  });
+}
+
+function resetBoard() {
+  document.querySelectorAll(".reviewer").forEach(card => {
+    card.classList.add("thinking");
+    $(".pins", card).innerHTML = "";
+    $(".status", card).textContent = "Reading the diff";
+  });
+  for (const key in confidences) delete confidences[key];
+  verdictEl.hidden = true; errorEl.hidden = true;
+  document.querySelectorAll(".stages li").forEach(li => li.dataset.state = "");
+}
+
+function showFindings(event) {
+  const card = $(`.reviewer[data-agent="${event.agent}"]`);
+  card.classList.remove("thinking");
+  const pins = $(".pins", card);
+  if (event.round === 1) {
+    $(".status", card).textContent = event.findings.length ? "" : "Nothing in my lane";
+    pins.innerHTML = event.findings.map(f => {
+      confidences[`${event.agent}|${f.file}|${f.line}`] = f.confidence;
+      flagLine(f.file, f.line, event.agent);
+      return `<div class="pin" data-key="${escapeHtml(`${f.file}|${f.line}`)}">
+        <div class="where">${escapeHtml(f.file)}:${f.line}</div>
+        <div>${escapeHtml(f.category)}</div>
+        <div class="conf">confidence <span>${f.confidence.toFixed(2)}</span></div></div>`;
+    }).join("");
+  } else {
+    // Rebuttal: strike the old confidence where it moved.
+    for (const f of event.findings) {
+      const key = `${event.agent}|${f.file}|${f.line}`, before = confidences[key];
+      const pin = pins.querySelector(`.pin[data-key="${CSS.escape(`${f.file}|${f.line}`)}"] .conf`);
+      if (pin && before !== undefined && Math.abs(before - f.confidence) > 0.001) {
+        pin.innerHTML = `confidence <s>${before.toFixed(2)}</s><span>${f.confidence.toFixed(2)}</span> after rebuttal`;
+      }
+      confidences[key] = f.confidence;
+    }
+  }
+}
+
+const HEADLINE = {
+  block: "Blocked: this change likely introduces a vulnerability",
+  request_changes: "Worth a look before merging",
+  approve: "No blocking security findings",
+};
+
+function renderFinding(f, index, reviewId, advisory) {
+  return `<div class="finding ${advisory ? "advisory" : ""}">
+    <div class="head">${escapeHtml(f.category)} <span class="where">${escapeHtml(f.file)}:${f.line}</span></div>
+    <p>${escapeHtml(f.claim)}</p>
+    <pre>${escapeHtml(f.evidence)}</pre>
+    <div class="vote" data-review="${reviewId}" data-index="${index}">
+      <span>Was this right?</span>
+      <button data-vote="up" aria-pressed="false">Yes</button>
+      <button data-vote="down" aria-pressed="false">No</button>
+      <span class="thanks" hidden>Saved</span>
+    </div>
+  </div>`;
+}
+
+function showVerdict(v) {
+  verdictEl.className = `sheet verdict ${v.decision}`;
+  let html = `<h2>${HEADLINE[v.decision]}</h2><p class="why">${escapeHtml(v.rationale)}</p>`;
+  let index = 0;
+  if (v.findings.length) {
+    html += `<h4>Blocking</h4>` + v.findings.map(f => renderFinding(f, index++, v.review_id, false)).join("");
+  }
+  if (v.advisory.length) {
+    html += `<h4>Advisory, does not block</h4>` + v.advisory.map(f => renderFinding(f, index++, v.review_id, true)).join("");
+  }
+  html += `<p class="cost">This review cost $${v.cost_usd.toFixed(3)} in API calls.</p>`;
+  verdictEl.innerHTML = html;
+  verdictEl.hidden = false;
+  document.querySelectorAll(".reviewer").forEach(c => c.classList.remove("thinking"));
+  document.querySelectorAll(".stages li").forEach(li => li.dataset.state = "done");
+}
+
+verdictEl.addEventListener("click", async e => {
+  const button = e.target.closest("button[data-vote]");
+  if (!button) return;
+  const box = button.closest(".vote");
+  const response = await fetch("/api/feedback", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ review_id: box.dataset.review, finding: +box.dataset.index, vote: button.dataset.vote }),
+  });
+  if (response.ok) {
+    box.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b === button));
+    $(".thanks", box).hidden = false;
+  }
+});
+
+function showError(message) {
+  errorEl.textContent = message; errorEl.hidden = false;
+  document.querySelectorAll(".reviewer").forEach(c => { c.classList.remove("thinking"); $(".status", c).textContent = ""; });
+}
+
+reviewBtn.addEventListener("click", async () => {
+  const body = source === "pr" ? { pr_url: prInput.value.trim() } : { diff: diffInput.value };
+  if (source === "diff" && !diffInput.value.trim()) { showError("Paste a diff first, or load the example."); return; }
+  if (source === "pr" && !prInput.value.trim()) { showError("Paste a pull request link first."); return; }
+
+  resetBoard();
+  reviewBtn.disabled = true; reviewBtn.textContent = "Reviewing";
+  if (source === "diff") renderDiff(diffInput.value);
+
+  try {
+    const response = await fetch("/api/review", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      const detail = (await response.json().catch(() => ({}))).detail;
+      showError(detail || `The review could not start (HTTP ${response.status}).`);
+      if (source === "diff") showInput();
+      return;
+    }
+    const reader = response.body.getReader(), decoder = new TextDecoder();
+    let buffer = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const chunks = buffer.split("\n\n"); buffer = chunks.pop();
+      for (const chunk of chunks) {
+        if (!chunk.startsWith("data: ")) continue;
+        const event = JSON.parse(chunk.slice(6));
+        if (event.type === "stage") setStage(event.stage);
+        else if (event.type === "findings") showFindings(event);
+        else if (event.type === "verdict") showVerdict(event);
+        else if (event.type === "error") showError(event.message);
+      }
+    }
+  } catch {
+    showError("Lost the connection to the server. Try again.");
+  } finally {
+    reviewBtn.disabled = false; reviewBtn.textContent = "Review";
+  }
+});
+</script>
+</body>
+</html>

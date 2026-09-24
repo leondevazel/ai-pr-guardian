@@ -19,6 +19,10 @@ unfiltered list is exactly what makes review tools get ignored.
 Respond with JSON and nothing else:
 {"kept": [<indices of findings worth a human's attention>],
  "rationale": "<2-4 sentences citing the specific findings you kept and why the dropped ones did not survive>"}
+
+The rationale is shown to the pull request's author, who never sees the numbered list. Refer to
+findings by what they are and where — "the SQL injection on demo/export.py:9" — never by index
+("finding 0"). The indices exist only for the "kept" array.
 """
 
 
@@ -35,7 +39,24 @@ class ChiefReviewer:
         raw = self.client.complete(system=SYSTEM, user=_render(findings), model=self.model)
         kept_indices, rationale = _parse(raw)
         kept = [findings[i] for i in kept_indices if 0 <= i < len(findings)]
-        return kept, rationale
+        return kept, scrub_indices(rationale)
+
+
+PAREN_INDEX = re.compile(
+    r"\s*\((?:findings?|indices|index|items?|#)\s*\d+(?:\s*(?:,|and|&)\s*\d+)*\)", re.IGNORECASE
+)
+BARE_INDEX = re.compile(r"\b[Ff]indings?\s+\d+(?:\s*(?:,|and|&)\s*\d+)*\b")
+
+
+def scrub_indices(rationale: str) -> str:
+    """Remove "(finding 2)"-style references the prompt forbids but the model still writes.
+
+    The author reading the PR comment never sees the numbered list, so an index is noise. Asking
+    nicely reduced these; it did not stop them, so the rule is enforced here instead."""
+    text = PAREN_INDEX.sub("", rationale)
+    text = BARE_INDEX.sub("one finding", text)
+    text = re.sub(r"(^|[.!?]\s+)one finding", lambda m: m.group(1) + "One finding", text)
+    return re.sub(r"\s{2,}", " ", text).strip()
 
 
 def _render(findings: list[Finding]) -> str:

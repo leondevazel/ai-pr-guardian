@@ -16,20 +16,29 @@ PRICES = {
 def load_api_key() -> str:
     """Environment wins; otherwise read .env from the repo root. Never logged, never printed."""
     if key := os.environ.get("ANTHROPIC_API_KEY"):
-        return key
+        return _clean(key)
 
     env_file = Path(__file__).resolve().parents[3] / ".env"
     if env_file.is_file():
         for line in env_file.read_text(encoding="utf-8").splitlines():
             name, _, value = line.partition("=")
             if name.strip() == "ANTHROPIC_API_KEY":
-                return value.strip().strip("\"'")
+                return _clean(value)
 
     raise RuntimeError(
         "No ANTHROPIC_API_KEY found. Create a .env file in the project root containing:\n"
         "ANTHROPIC_API_KEY=sk-ant-...\n"
         "(.env is gitignored.)"
     )
+
+
+def _clean(value: str) -> str:
+    """Absorb what pasting into a hosting dashboard tends to add: whitespace, quotes, or the
+    whole `NAME=value` line instead of just the value."""
+    value = value.strip()
+    if value.upper().startswith("ANTHROPIC_API_KEY"):
+        value = value.split("=", 1)[-1].strip()
+    return value.strip("\"'").strip()
 
 
 class AnthropicClient:

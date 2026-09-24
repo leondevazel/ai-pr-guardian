@@ -5,6 +5,10 @@ business logic) read a diff independently, rebut each other, and a chief reviewe
 findings worth a human's attention. The point is not to find more — it is to hand back fewer, better
 findings than a static analyzer does on its own.
 
+**Try it:** https://pr-guardian-ggsh.onrender.com — paste a diff, or click "Load the example".
+The free host sleeps when idle, so the first visit can take up to a minute to wake.
+A review of a real pull request: [#1](https://github.com/leondevazel/ai-pr-guardian/pull/1).
+
 Design lives in [agent.md](agent.md); the build order lives in [plan.md](plan.md).
 
 ## Setup

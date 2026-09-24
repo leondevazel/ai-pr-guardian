@@ -31,7 +31,7 @@ def render_comment(verdict: Verdict) -> str:
     if verdict.advisory:
         lines.append("")  # a heading glued to a closing code fence renders badly
         lines.append("### Advisory - does not block the merge")
-        lines.extend(_render_finding(f) for f in verdict.advisory)
+        lines.extend(_render_finding(f, advisory=True) for f in verdict.advisory)
 
     lines.append("")
     lines.append(
@@ -41,10 +41,15 @@ def render_comment(verdict: Verdict) -> str:
     return "\n".join(lines)
 
 
-def _render_finding(f: Finding) -> str:
+ADVISORY_SEVERITY = {"block": "high", "warn": "medium", "nit": "low"}
+
+
+def _render_finding(f: Finding, advisory: bool = False) -> str:
+    # Under a "does not block" heading, the word "block" reads as a contradiction.
+    severity = ADVISORY_SEVERITY.get(f.severity, f.severity) if advisory else f.severity
     return (
         f"\n**`{f.file}:{f.line}`** - {f.category} "
-        f"({f.severity}, confidence {f.confidence:.2f}, via {f.agent})\n\n"
+        f"({severity}, confidence {f.confidence:.2f}, via {f.agent})\n\n"
         f"{f.claim}\n\n"
         f"```\n{f.evidence}\n```"
     )

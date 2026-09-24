@@ -75,3 +75,12 @@ def test_advisory_heading_is_not_glued_to_a_code_fence():
     lines = body.splitlines()
     heading = next(i for i, line in enumerate(lines) if line.startswith("### Advisory"))
     assert lines[heading - 1] == ""
+
+
+def test_advisory_findings_never_say_block():
+    body = render_comment(
+        Verdict("approve", [], "x", advisory=[finding(agent="business_logic", severity="block")])
+    )
+    advisory = body.split("### Advisory")[1]
+    assert "(block," not in advisory
+    assert "(high," in advisory

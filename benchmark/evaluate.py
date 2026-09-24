@@ -89,77 +89,112 @@ def _post_change_ref(entry: dict) -> str:
     return parents[0]["sha"] if parents else entry["commit"]
 
 
-def run(manifest_path: Path, limit: int | None, out_dir: Path, split: str = "all") -> dict:
+def _default_review(diff_text: str, client):
+    return review_pr(repo_path=".", diff_text=diff_text, client=client, run_semgrep=lambda *_: [])
+
+
+def _default_baseline(entry: dict, diff_text: str, cache_dir: Path):
+    return semgrep_baseline_at(entry["repo"], _post_change_ref(entry), diff_text, cache_dir)
+
+
+def run(
+    manifest_path: Path,
+    limit: int | None,
+    out_dir: Path,
+    split: str = "all",
+    checkpoint: Path | None = None,
+    client=None,
+    review_fn=_default_review,
+    baseline_fn=_default_baseline,
+) -> dict:
+    """Scores every example, appending each result to `checkpoint` as soon as it exists.
+
+    A run that dies partway (credits ran out 55 examples into a dev run) resumes from the
+    checkpoint instead of paying again for the examples it already finished."""
     entries = json.loads(manifest_path.read_text(encoding="utf-8"))
     if split != "all":
         entries = [e for e in entries if e.get("split") == split]
     entries = entries[:limit]
     cache_dir = manifest_path.parent / "files"
-    client = AnthropicClient()
+    client = client or AnthropicClient()
 
-    labels, pipeline_predictions, pipeline_verdicts, security_predictions = [], [], [], []
-    baseline_predictions, baseline_finding_counts = [], []
-    per_example = []
+    done: dict[str, dict] = {}
+    if checkpoint and checkpoint.is_file():
+        for line in checkpoint.read_text(encoding="utf-8").splitlines():
+            record = json.loads(line)
+            done[record["id"]] = record
+        print(f"resuming: {len(done)} examples already scored in {checkpoint.name}")
 
     for i, entry in enumerate(entries, 1):
+        if entry["id"] in done:
+            continue
         diff_text = Path(entry["diff_path"]).read_text(encoding="utf-8")
         print(f"[{i}/{len(entries)}] {entry['id']} (vulnerable={entry['is_vulnerable']})")
 
+        cost_before = client.total_cost_usd()
         # The agents see only the diff; Semgrep gets the whole post-change file (baselines.py).
-        verdict = review_pr(repo_path=".", diff_text=diff_text, client=client, run_semgrep=lambda *_: [])
-        baseline_decision, baseline_count = semgrep_baseline_at(
-            entry["repo"], _post_change_ref(entry), diff_text, cache_dir
-        )
+        verdict = review_fn(diff_text, client)
+        baseline_decision, baseline_count = baseline_fn(entry, diff_text, cache_dir)
 
-        labels.append(bool(entry["is_vulnerable"]))
-        pipeline_predictions.append(all_findings_decision(verdict))
-        security_predictions.append(verdict.decision)
-        pipeline_verdicts.append(verdict)
-        baseline_predictions.append(baseline_decision)
-        baseline_finding_counts.append(baseline_count)
+        record = {
+            "id": entry["id"],
+            "is_vulnerable": entry["is_vulnerable"],
+            "pipeline": all_findings_decision(verdict),
+            "pipeline_security_only": verdict.decision,
+            "pipeline_findings": [asdict(f) for f in verdict.findings],
+            "advisory_findings": [asdict(f) for f in verdict.advisory],
+            "rationale": verdict.rationale,
+            "baseline": baseline_decision,
+            "baseline_findings": baseline_count,
+            "cost_usd": round(client.total_cost_usd() - cost_before, 6),
+        }
+        done[entry["id"]] = record
+        if checkpoint:
+            checkpoint.parent.mkdir(parents=True, exist_ok=True)
+            with checkpoint.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(record) + "\n")
 
-        per_example.append(
-            {
-                "id": entry["id"],
-                "is_vulnerable": entry["is_vulnerable"],
-                "pipeline": all_findings_decision(verdict),
-                "pipeline_security_only": verdict.decision,
-                "pipeline_findings": [asdict(f) for f in verdict.findings],
-                "advisory_findings": [asdict(f) for f in verdict.advisory],
-                "rationale": verdict.rationale,
-                "baseline": baseline_decision,
-                "baseline_findings": baseline_count,
-            }
-        )
-
-    benign_baseline_counts = [c for c, y in zip(baseline_finding_counts, labels) if not y]
-    results = {
-        "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "n_examples": len(entries),
-        "split": split,
-        "pipeline": asdict(score(pipeline_predictions, labels)),
-        "pipeline_security_only": asdict(score(security_predictions, labels)),
-        "baseline": asdict(score(baseline_predictions, labels)),
-        "f1_ci95": {
-            "pipeline": f1_confidence_interval(pipeline_predictions, labels),
-            "pipeline_security_only": f1_confidence_interval(security_predictions, labels),
-            "baseline": f1_confidence_interval(baseline_predictions, labels),
-        },
-        "pipeline_noise_ratio": round(noise_ratio(pipeline_verdicts, labels), 3),
-        "baseline_noise_ratio": round(
-            sum(benign_baseline_counts) / len(benign_baseline_counts), 3
-        )
-        if benign_baseline_counts
-        else 0.0,
-        "cost_usd": round(client.total_cost_usd(), 4),
-        "examples": per_example,
-    }
+    per_example = [done[e["id"]] for e in entries]
+    results = summarize(per_example, split)
 
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{datetime.now():%Y%m%d-%H%M%S}.json"
     out_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
     _print_summary(results, out_path)
+    if checkpoint and checkpoint.is_file():
+        checkpoint.unlink()  # complete: the results file is now the record
     return results
+
+
+def summarize(per_example: list[dict], split: str) -> dict:
+    labels = [bool(r["is_vulnerable"]) for r in per_example]
+    pipeline = [r["pipeline"] for r in per_example]
+    security = [r["pipeline_security_only"] for r in per_example]
+    baseline = [r["baseline"] for r in per_example]
+    benign = [r for r in per_example if not r["is_vulnerable"]]
+
+    def per_benign(count) -> float:
+        return round(sum(count(r) for r in benign) / len(benign), 3) if benign else 0.0
+
+    return {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "n_examples": len(per_example),
+        "split": split,
+        "pipeline": asdict(score(pipeline, labels)),
+        "pipeline_security_only": asdict(score(security, labels)),
+        "baseline": asdict(score(baseline, labels)),
+        "f1_ci95": {
+            "pipeline": f1_confidence_interval(pipeline, labels),
+            "pipeline_security_only": f1_confidence_interval(security, labels),
+            "baseline": f1_confidence_interval(baseline, labels),
+        },
+        "pipeline_noise_ratio": per_benign(
+            lambda r: len(r["pipeline_findings"]) + len(r["advisory_findings"])
+        ),
+        "baseline_noise_ratio": per_benign(lambda r: r["baseline_findings"]),
+        "cost_usd": round(sum(r.get("cost_usd", 0) for r in per_example), 4),
+        "examples": per_example,
+    }
 
 
 def _print_summary(results: dict, out_path: Path) -> None:
@@ -219,8 +254,10 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    out = Path(args.out)
     runs = [
-        run(Path(args.manifest), args.limit, Path(args.out), args.split) for _ in range(args.repeats)
+        run(Path(args.manifest), args.limit, out, args.split, out / f"inprogress-{args.split}-r{k}.jsonl")
+        for k in range(1, args.repeats + 1)
     ]
     summarize_repeats(runs)
 

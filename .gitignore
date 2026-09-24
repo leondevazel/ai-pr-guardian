@@ -13,3 +13,4 @@ benchmark/dataset/files/
 web/data/
 build_v2.log
 benchmark/dataset-v1/
+eval_*.log

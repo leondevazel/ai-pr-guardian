@@ -21,6 +21,18 @@ Rules:
 """
 
 
+KOREAN_OUTPUT = (
+    "\nWrite the human-readable prose (the \"claim\" field, and any rationale) in Korean. Keep "
+    "code, identifiers, file paths, and the \"category\" value exactly as they are, and keep the "
+    "JSON keys in English.\n"
+)
+
+
+def language_instruction(language: str) -> str:
+    """Empty for English, so the English prompts stay identical to the benchmarked ones."""
+    return KOREAN_OUTPUT if language == "ko" else ""
+
+
 def parse_findings(raw: str, agent: str) -> list[Finding]:
     """Never raises. Anything malformed or unlocatable is dropped, by design (agent.md §2)."""
     data = _extract_json_array(raw)
@@ -103,8 +115,9 @@ class ReviewAgent:
     must_not: str
     model: str = HAIKU
 
-    def __init__(self, client):
+    def __init__(self, client, language: str = "en"):
         self.client = client
+        self.language = language
 
     def review(self, ctx: PRContext, tools: list[ToolFinding], contexts=()) -> list[Finding]:
         raw = self.client.complete(
@@ -165,6 +178,7 @@ class ReviewAgent:
             "laziness, it is the point: duplicate and off-mandate findings are what make review "
             "tools unusable.\n"
             f"{OUTPUT_CONTRACT}"
+            f"{language_instruction(self.language)}"
         )
 
     def _user_prompt(self, ctx: PRContext, tools: list[ToolFinding], contexts=()) -> str:

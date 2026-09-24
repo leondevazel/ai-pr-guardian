@@ -7,7 +7,7 @@
 <meta name="description" content="Three AI reviewers read your diff, argue, and only security findings can block the merge.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500;700;900&family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper: #EDEFF2;
@@ -21,8 +21,9 @@
     --ochre-wash: #FBF2E2;
     --green: #2F7D6D;
     --green-wash: #E5F2EF;
-    --sans: "Schibsted Grotesk", system-ui, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, monospace;
+    /* Schibsted has no Hangul; Noto Sans KR picks up the Korean glyphs at matching weights. */
+    --sans: "Schibsted Grotesk", "Noto Sans KR", system-ui, sans-serif;
+    --mono: "JetBrains Mono", "Noto Sans KR", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 var(--sans); }
@@ -159,59 +160,60 @@
 <header>
   <div>
     <h1>PR Guardian</h1>
-    <p class="tagline">Three reviewers read the same diff, argue about it, and a chief reviewer keeps what matters. Only security findings can block a merge.</p>
+    <p class="tagline" data-i18n="tagline"></p>
   </div>
   <nav>
-    <a href="https://github.com/leondevazel/ai-pr-guardian">Source</a>
-    <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">How well it works</a>
+    <a href="https://github.com/leondevazel/ai-pr-guardian" data-i18n="source"></a>
+    <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md" data-i18n="howWell"></a>
+    <button id="lang" class="quiet lang-toggle" type="button"></button>
   </nav>
 </header>
 
 <main>
-  <section class="sheet manuscript" aria-label="Code to review">
+  <section class="sheet manuscript" data-i18n-label="codeToReview">
     <div class="source-tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-source="diff">Paste a diff</button>
-      <button role="tab" aria-selected="false" data-source="pr">Link a GitHub PR</button>
+      <button role="tab" aria-selected="true" data-source="diff" data-i18n="tabDiff"></button>
+      <button role="tab" aria-selected="false" data-source="pr" data-i18n="tabPr"></button>
     </div>
-    <textarea id="diff-input" spellcheck="false" aria-label="Unified diff" placeholder="Paste the output of `git diff` here, or load the example."></textarea>
-    <input id="pr-input" type="url" hidden aria-label="Pull request URL" placeholder="https://github.com/owner/repo/pull/123">
+    <textarea id="diff-input" spellcheck="false" data-i18n-label="diffLabel" data-i18n-placeholder="diffPlaceholder"></textarea>
+    <input id="pr-input" type="url" hidden data-i18n-label="prLabel" placeholder="https://github.com/owner/repo/pull/123">
     <div id="diff-view" class="diff" hidden></div>
     <div class="actions">
-      <button id="review" class="primary">Review</button>
-      <button id="example" class="quiet">Load the example</button>
-      <button id="edit" class="quiet" hidden>Edit the diff</button>
-      <span class="note">Public repos only. Up to 400 lines.</span>
+      <button id="review" class="primary" data-i18n="review"></button>
+      <button id="example" class="quiet" data-i18n="loadExample"></button>
+      <button id="edit" class="quiet" hidden data-i18n="editDiff"></button>
+      <span class="note" data-i18n="note"></span>
     </div>
   </section>
 
-  <section class="board" aria-label="Review board" aria-live="polite">
+  <section class="board" data-i18n-label="board" aria-live="polite">
     <ol class="stages">
-      <li data-stage="round1">1. Independent review</li>
-      <li data-stage="rebuttal">2. Rebuttal</li>
-      <li data-stage="chief">3. Chief's verdict</li>
+      <li data-stage="round1" data-i18n="stage1"></li>
+      <li data-stage="rebuttal" data-i18n="stage2"></li>
+      <li data-stage="chief" data-i18n="stage3"></li>
     </ol>
 
     <div class="reviewers">
       <article class="sheet reviewer" data-agent="security">
-        <h3>Security</h3>
-        <p class="role">Injection, auth bypass, secrets, traversal</p>
-        <div class="power">Can block the merge</div>
+        <h3 data-i18n="securityName"></h3>
+        <p class="role" data-i18n="securityRole"></p>
+        <div class="power" data-i18n="canBlock"></div>
         <div class="pins"></div>
-        <p class="status">Waiting for a diff</p>
+        <p class="status" data-i18n="waiting"></p>
       </article>
       <article class="sheet reviewer" data-agent="architecture">
-        <h3>Architecture</h3>
-        <p class="role">Breaking changes, layering, lost errors</p>
-        <div class="power">Advises only</div>
+        <h3 data-i18n="architectureName"></h3>
+        <p class="role" data-i18n="architectureRole"></p>
+        <div class="power" data-i18n="advisesOnly"></div>
         <div class="pins"></div>
-        <p class="status">Waiting for a diff</p>
+        <p class="status" data-i18n="waiting"></p>
       </article>
       <article class="sheet reviewer" data-agent="business_logic">
-        <h3>Business logic</h3>
-        <p class="role">Boundaries, conditionals, None cases</p>
-        <div class="power">Advises only</div>
+        <h3 data-i18n="businessName"></h3>
+        <p class="role" data-i18n="businessRole"></p>
+        <div class="power" data-i18n="advisesOnly"></div>
         <div class="pins"></div>
-        <p class="status">Waiting for a diff</p>
+        <p class="status" data-i18n="waiting"></p>
       </article>
     </div>
 
@@ -221,8 +223,8 @@
 </main>
 
 <footer>
-  <p>On a benchmark built from real CVE fix commits, the security reviewer's blocking findings were right every time (6 of 6) but it caught about a third of the vulnerabilities. The other two reviewers catch far more and are wrong far more, which is why they only advise. Full numbers and limits are in <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">RESULTS.md</a>.</p>
-  <p>Your votes on findings are stored with the review so the next benchmark can use them. Diffs you submit are sent to Anthropic's API for review.</p>
+  <p data-i18n-html="footer1"></p>
+  <p data-i18n="footer2"></p>
 </footer>
 
 <script>
@@ -254,6 +256,145 @@ new file mode 100644
 +    return items[start : start + PAGE_SIZE - 1]
 +
 `;
+
+const STRINGS = {
+  en: {
+    pageTitle: "PR Guardian",
+    description: "Three AI reviewers read your diff, argue, and only security findings can block the merge.",
+    tagline: "Three reviewers read the same diff, argue about it, and a chief reviewer keeps what matters. Only security findings can block a merge.",
+    source: "Source",
+    howWell: "How well it works",
+    otherLang: "한국어",
+    otherLangLabel: "한국어로 보기",
+    codeToReview: "Code to review",
+    tabDiff: "Paste a diff",
+    tabPr: "Link a GitHub PR",
+    diffLabel: "Unified diff",
+    prLabel: "Pull request URL",
+    diffPlaceholder: "Paste the output of `git diff` here, or load the example.",
+    review: "Review",
+    reviewing: "Reviewing",
+    loadExample: "Load the example",
+    editDiff: "Edit the diff",
+    note: "Public repos only. Up to 400 lines.",
+    board: "Review board",
+    stage1: "1. Independent review",
+    stage2: "2. Rebuttal",
+    stage3: "3. Chief's verdict",
+    securityName: "Security",
+    securityRole: "Injection, auth bypass, secrets, traversal",
+    architectureName: "Architecture",
+    architectureRole: "Breaking changes, layering, lost errors",
+    businessName: "Business logic",
+    businessRole: "Boundaries, conditionals, None cases",
+    canBlock: "Can block the merge",
+    advisesOnly: "Advises only",
+    waiting: "Waiting for a diff",
+    reading: "Reading the diff",
+    nothingInLane: "Nothing in my lane",
+    confidence: "confidence",
+    afterRebuttal: "after rebuttal",
+    headline_block: "Blocked: this change likely introduces a vulnerability",
+    headline_request_changes: "Worth a look before merging",
+    headline_approve: "No blocking security findings",
+    blocking: "Blocking",
+    advisory: "Advisory, does not block",
+    wasThisRight: "Was this right?",
+    yes: "Yes",
+    no: "No",
+    saved: "Saved",
+    cost: "This review cost ${cost} in API calls.",
+    needDiff: "Paste a diff first, or load the example.",
+    needLink: "Paste a pull request link first.",
+    couldNotStart: "The review could not start (HTTP {status}).",
+    lostConnection: "Lost the connection to the server. Try again.",
+    footer1: 'On a benchmark built from real CVE fix commits, the security reviewer\'s blocking findings were right every time (6 of 6) but it caught about a third of the vulnerabilities. The other two reviewers catch far more and are wrong far more, which is why they only advise. Full numbers and limits are in <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">RESULTS.md</a>.',
+    footer2: "Your votes on findings are stored with the review so the next benchmark can use them. Diffs you submit are sent to Anthropic's API for review.",
+  },
+  ko: {
+    pageTitle: "PR Guardian",
+    description: "AI 검토자 세 명이 diff를 읽고 토론합니다. 머지를 막을 수 있는 건 보안 지적뿐입니다.",
+    tagline: "검토자 세 명이 같은 diff를 읽고 서로 반박한 뒤, 수석 검토자가 중요한 것만 남깁니다. 머지를 막을 수 있는 건 보안 지적뿐입니다.",
+    source: "소스 코드",
+    howWell: "성능은 어느 정도인가",
+    otherLang: "English",
+    otherLangLabel: "View in English",
+    codeToReview: "검토할 코드",
+    tabDiff: "diff 붙여넣기",
+    tabPr: "GitHub PR 링크",
+    diffLabel: "unified diff",
+    prLabel: "PR 주소",
+    diffPlaceholder: "`git diff` 결과를 여기에 붙여넣거나 예시를 불러오세요.",
+    review: "리뷰하기",
+    reviewing: "리뷰 중",
+    loadExample: "예시 불러오기",
+    editDiff: "diff 수정하기",
+    note: "공개 저장소만 가능합니다. 최대 400줄.",
+    board: "검토 위원회",
+    stage1: "1. 개별 검토",
+    stage2: "2. 반박",
+    stage3: "3. 최종 판정",
+    securityName: "보안",
+    securityRole: "인젝션, 인증 우회, 비밀정보, 경로 조작",
+    architectureName: "아키텍처",
+    architectureRole: "호환성 깨짐, 계층 위반, 누락된 오류 처리",
+    businessName: "비즈니스 로직",
+    businessRole: "경계값, 조건문, None 처리",
+    canBlock: "머지를 막을 수 있음",
+    advisesOnly: "참고 의견만",
+    waiting: "diff를 기다리는 중",
+    reading: "diff를 읽는 중",
+    nothingInLane: "제 담당 영역에선 문제 없음",
+    confidence: "확신도",
+    afterRebuttal: "(반박 후)",
+    headline_block: "차단: 취약점이 들어올 가능성이 높습니다",
+    headline_request_changes: "머지 전에 한 번 확인해 보세요",
+    headline_approve: "머지를 막을 보안 문제가 없습니다",
+    blocking: "차단",
+    advisory: "참고 의견 (머지를 막지 않음)",
+    wasThisRight: "이 지적이 맞았나요?",
+    yes: "맞음",
+    no: "틀림",
+    saved: "저장됨",
+    cost: "이번 리뷰의 API 비용은 ${cost}입니다.",
+    needDiff: "먼저 diff를 붙여넣거나 예시를 불러오세요.",
+    needLink: "먼저 PR 링크를 붙여넣어 주세요.",
+    couldNotStart: "리뷰를 시작하지 못했습니다 (HTTP {status}).",
+    lostConnection: "서버와 연결이 끊어졌습니다. 다시 시도해 주세요.",
+    footer1: '실제 CVE 수정 커밋으로 만든 벤치마크에서, 보안 검토자가 차단한 지적은 모두 맞았지만(6건 중 6건) 전체 취약점의 약 3분의 1만 잡아냈습니다. 나머지 두 검토자는 훨씬 많이 잡지만 틀리는 경우도 훨씬 많아서, 참고 의견만 냅니다. 전체 수치와 한계는 <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">RESULTS.md</a>에 있습니다.',
+    footer2: "지적에 대한 투표는 리뷰와 함께 저장되어 다음 벤치마크에 쓰입니다. 제출한 diff는 리뷰를 위해 Anthropic API로 전송됩니다.",
+  },
+};
+
+function storedLang() {
+  try { return localStorage.getItem("lang"); } catch { return null; }
+}
+let lang = storedLang() || ((navigator.language || "").toLowerCase().startsWith("ko") ? "ko" : "en");
+
+function t(key, vars = {}) {
+  const text = STRINGS[lang][key] ?? STRINGS.en[key] ?? key;
+  return text.replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? "");
+}
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = t("pageTitle");
+  document.querySelector('meta[name="description"]').content = t("description");
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll("[data-i18n-label]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nLabel)));
+  const toggle = document.querySelector("#lang");
+  toggle.textContent = t("otherLang");
+  toggle.setAttribute("aria-label", t("otherLangLabel"));
+}
+
+document.querySelector("#lang").addEventListener("click", () => {
+  lang = lang === "ko" ? "en" : "ko";
+  try { localStorage.setItem("lang", lang); } catch {}
+  applyLang();
+});
+applyLang();
 
 const $ = (s, root = document) => root.querySelector(s);
 const diffInput = $("#diff-input"), prInput = $("#pr-input"), diffView = $("#diff-view");
@@ -327,7 +468,7 @@ function resetBoard() {
   document.querySelectorAll(".reviewer").forEach(card => {
     card.classList.add("thinking");
     $(".pins", card).innerHTML = "";
-    $(".status", card).textContent = "Reading the diff";
+    $(".status", card).textContent = t("reading");
   });
   for (const key in confidences) delete confidences[key];
   verdictEl.hidden = true; errorEl.hidden = true;
@@ -339,14 +480,14 @@ function showFindings(event) {
   card.classList.remove("thinking");
   const pins = $(".pins", card);
   if (event.round === 1) {
-    $(".status", card).textContent = event.findings.length ? "" : "Nothing in my lane";
+    $(".status", card).textContent = event.findings.length ? "" : t("nothingInLane");
     pins.innerHTML = event.findings.map(f => {
       confidences[`${event.agent}|${f.file}|${f.line}`] = f.confidence;
       flagLine(f.file, f.line, event.agent);
       return `<div class="pin" data-key="${escapeHtml(`${f.file}|${f.line}`)}">
         <div class="where">${escapeHtml(f.file)}:${f.line}</div>
         <div>${escapeHtml(f.category)}</div>
-        <div class="conf">confidence <span>${f.confidence.toFixed(2)}</span></div></div>`;
+        <div class="conf">${t("confidence")} <span>${f.confidence.toFixed(2)}</span></div></div>`;
     }).join("");
   } else {
     // Rebuttal: strike the old confidence where it moved.
@@ -354,18 +495,12 @@ function showFindings(event) {
       const key = `${event.agent}|${f.file}|${f.line}`, before = confidences[key];
       const pin = pins.querySelector(`.pin[data-key="${CSS.escape(`${f.file}|${f.line}`)}"] .conf`);
       if (pin && before !== undefined && Math.abs(before - f.confidence) > 0.001) {
-        pin.innerHTML = `confidence <s>${before.toFixed(2)}</s><span>${f.confidence.toFixed(2)}</span> after rebuttal`;
+        pin.innerHTML = `${t("confidence")} <s>${before.toFixed(2)}</s><span>${f.confidence.toFixed(2)}</span> ${t("afterRebuttal")}`;
       }
       confidences[key] = f.confidence;
     }
   }
 }
-
-const HEADLINE = {
-  block: "Blocked: this change likely introduces a vulnerability",
-  request_changes: "Worth a look before merging",
-  approve: "No blocking security findings",
-};
 
 function renderFinding(f, index, reviewId, advisory) {
   return `<div class="finding ${advisory ? "advisory" : ""}">
@@ -373,25 +508,25 @@ function renderFinding(f, index, reviewId, advisory) {
     <p>${escapeHtml(f.claim)}</p>
     <pre>${escapeHtml(f.evidence)}</pre>
     <div class="vote" data-review="${reviewId}" data-index="${index}">
-      <span>Was this right?</span>
-      <button data-vote="up" aria-pressed="false">Yes</button>
-      <button data-vote="down" aria-pressed="false">No</button>
-      <span class="thanks" hidden>Saved</span>
+      <span>${t("wasThisRight")}</span>
+      <button data-vote="up" aria-pressed="false">${t("yes")}</button>
+      <button data-vote="down" aria-pressed="false">${t("no")}</button>
+      <span class="thanks" hidden>${t("saved")}</span>
     </div>
   </div>`;
 }
 
 function showVerdict(v) {
   verdictEl.className = `sheet verdict ${v.decision}`;
-  let html = `<h2>${HEADLINE[v.decision]}</h2><p class="why">${escapeHtml(v.rationale)}</p>`;
+  let html = `<h2>${t("headline_" + v.decision)}</h2><p class="why">${escapeHtml(v.rationale)}</p>`;
   let index = 0;
   if (v.findings.length) {
-    html += `<h4>Blocking</h4>` + v.findings.map(f => renderFinding(f, index++, v.review_id, false)).join("");
+    html += `<h4>${t("blocking")}</h4>` + v.findings.map(f => renderFinding(f, index++, v.review_id, false)).join("");
   }
   if (v.advisory.length) {
-    html += `<h4>Advisory, does not block</h4>` + v.advisory.map(f => renderFinding(f, index++, v.review_id, true)).join("");
+    html += `<h4>${t("advisory")}</h4>` + v.advisory.map(f => renderFinding(f, index++, v.review_id, true)).join("");
   }
-  html += `<p class="cost">This review cost $${v.cost_usd.toFixed(3)} in API calls.</p>`;
+  html += `<p class="cost">${t("cost", { cost: v.cost_usd.toFixed(3) })}</p>`;
   verdictEl.innerHTML = html;
   verdictEl.hidden = false;
   document.querySelectorAll(".reviewer").forEach(c => c.classList.remove("thinking"));
@@ -418,12 +553,12 @@ function showError(message) {
 }
 
 reviewBtn.addEventListener("click", async () => {
-  const body = source === "pr" ? { pr_url: prInput.value.trim() } : { diff: diffInput.value };
-  if (source === "diff" && !diffInput.value.trim()) { showError("Paste a diff first, or load the example."); return; }
-  if (source === "pr" && !prInput.value.trim()) { showError("Paste a pull request link first."); return; }
+  const body = source === "pr" ? { pr_url: prInput.value.trim(), lang } : { diff: diffInput.value, lang };
+  if (source === "diff" && !diffInput.value.trim()) { showError(t("needDiff")); return; }
+  if (source === "pr" && !prInput.value.trim()) { showError(t("needLink")); return; }
 
   resetBoard();
-  reviewBtn.disabled = true; reviewBtn.textContent = "Reviewing";
+  reviewBtn.disabled = true; reviewBtn.textContent = t("reviewing");
   if (source === "diff") renderDiff(diffInput.value);
 
   try {
@@ -432,7 +567,7 @@ reviewBtn.addEventListener("click", async () => {
     });
     if (!response.ok) {
       const detail = (await response.json().catch(() => ({}))).detail;
-      showError(detail || `The review could not start (HTTP ${response.status}).`);
+      showError(detail || t("couldNotStart", { status: response.status }));
       if (source === "diff") showInput();
       return;
     }
@@ -453,9 +588,9 @@ reviewBtn.addEventListener("click", async () => {
       }
     }
   } catch {
-    showError("Lost the connection to the server. Try again.");
+    showError(t("lostConnection"));
   } finally {
-    reviewBtn.disabled = false; reviewBtn.textContent = "Review";
+    reviewBtn.disabled = false; reviewBtn.textContent = t("review");
   }
 });
 </script>

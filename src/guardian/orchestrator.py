@@ -36,14 +36,15 @@ def decide_on_all(findings: list[Finding]) -> Decision:
 
 
 def review_pr(
-    repo_path: str, diff_text: str, client, run_semgrep=_run_semgrep, on_event=None
+    repo_path: str, diff_text: str, client, run_semgrep=_run_semgrep, on_event=None,
+    language: str = "en",
 ) -> Verdict:
     ctx = parse_diff(diff_text)
     changed_files = [f.path for f in ctx.files]
     tools = run_semgrep(repo_path, changed_files)
     contexts = _repo_contexts(repo_path, ctx)
 
-    agents = [cls(client) for cls in AGENT_CLASSES]
+    agents = [cls(client, language) for cls in AGENT_CLASSES]
     emit = on_event or (lambda event: None)
 
     def reviewed(agent):
@@ -68,7 +69,7 @@ def review_pr(
 
     emit({"type": "stage", "stage": "chief"})
     all_findings = [f for group in round2 for f in group]
-    kept, rationale = ChiefReviewer(client).select(all_findings)
+    kept, rationale = ChiefReviewer(client, language).select(all_findings)
     kept.sort(key=lambda f: (_severity_rank(f.severity), -f.confidence))
 
     blocking = [f for f in kept if f.agent in BLOCKING_AGENTS]

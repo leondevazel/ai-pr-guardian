@@ -23,22 +23,66 @@ from pydantic import BaseModel
 MAX_DIFF_LINES = 400
 # Sized for a $5 prepaid balance: even a bot hammering the site gets ten days, not five.
 DEFAULT_DAILY_BUDGET_USD = 0.5
-PAUSED_MESSAGE = (
-    "The live demo is paused because its review budget is used up. "
-    "The example pull request on GitHub shows a full review in the meantime."
-)
+MESSAGES = {
+    "empty": {"en": "The diff is empty.", "ko": "diff가 비어 있습니다."},
+    "not_diff": {
+        "en": "That does not look like a unified diff (expected `+++` and `@@` lines).",
+        "ko": "unified diff 형식이 아닌 것 같습니다 (`+++`와 `@@`로 시작하는 줄이 있어야 합니다).",
+    },
+    "too_large": {
+        "en": "Diff too large for the public demo (limit {limit} lines).",
+        "ko": "공개 데모에서 다루기엔 diff가 너무 큽니다 (최대 {limit}줄).",
+    },
+    "bad_link": {
+        "en": "Paste a link like https://github.com/owner/repo/pull/123",
+        "ko": "https://github.com/owner/repo/pull/123 형식의 링크를 붙여넣어 주세요.",
+    },
+    "fetch_failed": {
+        "en": "Could not fetch that pull request. Is it public?",
+        "ko": "해당 PR을 가져오지 못했습니다. 공개 저장소인지 확인해 주세요.",
+    },
+    "budget": {
+        "en": "Today's demo budget is used up. It resets at midnight UTC.",
+        "ko": "오늘의 데모 예산을 모두 사용했습니다. 한국 시간 오전 9시에 초기화됩니다.",
+    },
+    "visitor_limit": {
+        "en": "You have reached today's limit of {limit} reviews.",
+        "ko": "오늘 사용할 수 있는 리뷰 {limit}회를 모두 사용하셨습니다.",
+    },
+    "paused": {
+        "en": "The live demo is paused because its review budget is used up. "
+        "The example pull request on GitHub shows a full review in the meantime.",
+        "ko": "리뷰 예산이 소진되어 라이브 데모가 일시 중지되었습니다. "
+        "그동안 GitHub의 예시 PR에서 전체 리뷰 결과를 보실 수 있습니다.",
+    },
+    "auth": {
+        "en": "The demo is misconfigured. The owner has been notified in the logs.",
+        "ko": "데모 설정에 문제가 있습니다. 서버 로그에 기록되었습니다.",
+    },
+    "other": {
+        "en": "The review could not finish. Try again in a minute.",
+        "ko": "리뷰를 끝내지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    },
+}
+
+
+def message(key: str, lang: str = "en", **values) -> str:
+    return MESSAGES[key].get(lang, MESSAGES[key]["en"]).format(**values)
+
+
+PAUSED_MESSAGE = message("paused")
 PR_URL = re.compile(r"^https://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)/?$")
 STATIC = Path(__file__).parent / "static"
 log = logging.getLogger("pr_guardian.web")
 
 
-def validate_diff(diff_text: str) -> str | None:
+def validate_diff(diff_text: str, lang: str = "en") -> str | None:
     if not diff_text.strip():
-        return "The diff is empty."
+        return message("empty", lang)
     if "@@" not in diff_text or not re.search(r"(?m)^\+\+\+ ", diff_text):
-        return "That does not look like a unified diff (expected `+++` and `@@` lines)."
+        return message("not_diff", lang)
     if len(diff_text.splitlines()) > MAX_DIFF_LINES:
-        return f"Diff too large for the public demo (limit {MAX_DIFF_LINES} lines)."
+        return message("too_large", lang, limit=MAX_DIFF_LINES)
     return None
 
 
@@ -66,13 +110,13 @@ class UsageGuard:
         if today != self._day:
             self._day, self._spent, self._counts = today, 0.0, {}
 
-    def check(self, visitor: str) -> str | None:
+    def check(self, visitor: str, lang: str = "en") -> str | None:
         with self._lock:
             self._roll()
             if self._spent >= self.daily_budget_usd:
-                return "Today's demo budget is used up. It resets at midnight UTC."
+                return message("budget", lang)
             if self._counts.get(visitor, 0) >= self.per_visitor:
-                return f"You have reached today's limit of {self.per_visitor} reviews."
+                return message("visitor_limit", lang, limit=self.per_visitor)
             return None
 
     def record(self, visitor: str, cost_usd: float) -> None:
@@ -85,6 +129,7 @@ class UsageGuard:
 class ReviewRequest(BaseModel):
     diff: str | None = None
     pr_url: str | None = None
+    lang: Literal["en", "ko"] = "en"
 
 
 class FeedbackRequest(BaseModel):
@@ -93,14 +138,16 @@ class FeedbackRequest(BaseModel):
     vote: Literal["up", "down"]
 
 
-def default_review(diff_text: str, on_event) -> tuple:
+def default_review(diff_text: str, on_event, language: str = "en") -> tuple:
     from guardian.llm.client import AnthropicClient
     from guardian.orchestrator import review_pr
 
     client = AnthropicClient()
     # No repository checkout on the server: the board sees the diff alone, exactly as in the
     # benchmark, so the numbers in RESULTS.md describe what visitors get.
-    verdict = review_pr(".", diff_text, client, run_semgrep=lambda *_: [], on_event=on_event)
+    verdict = review_pr(
+        ".", diff_text, client, run_semgrep=lambda *_: [], on_event=on_event, language=language
+    )
     return verdict, client.total_cost_usd()
 
 
@@ -129,31 +176,32 @@ def create_app(review_fn=default_review, fetch_pr=default_fetch_pr, data_dir=Non
 
     @app.post("/api/review")
     def review(body: ReviewRequest, request: Request):
+        lang = body.lang
         diff_text = body.diff or ""
         if body.pr_url:
             parsed = parse_pr_url(body.pr_url)
             if not parsed:
-                raise HTTPException(400, "Paste a link like https://github.com/owner/repo/pull/123")
+                raise HTTPException(400, message("bad_link", lang))
             try:
                 diff_text = fetch_pr(*parsed)
             except Exception:
-                raise HTTPException(400, "Could not fetch that pull request. Is it public?")
+                raise HTTPException(400, message("fetch_failed", lang))
 
-        if problem := validate_diff(diff_text):
+        if problem := validate_diff(diff_text, lang):
             raise HTTPException(400, problem)
 
         if state["paused"]:
-            raise HTTPException(503, PAUSED_MESSAGE)
+            raise HTTPException(503, message("paused", lang))
 
         visitor = request.client.host if request.client else "unknown"
-        if problem := guard.check(visitor):
+        if problem := guard.check(visitor, lang):
             raise HTTPException(429, problem)
 
         events: queue.Queue = queue.Queue()
 
         def work():
             try:
-                verdict, cost = review_fn(diff_text, events.put)
+                verdict, cost = review_fn(diff_text, events.put, language=lang)
                 guard.record(visitor, cost)
                 review_id = uuid.uuid4().hex[:12]
                 ordered = verdict.findings + verdict.advisory
@@ -169,12 +217,12 @@ def create_app(review_fn=default_review, fetch_pr=default_fetch_pr, data_dir=Non
                 text = str(error).lower()
                 if "credit balance" in text:
                     state["paused"] = True
-                    code, message = "credits", PAUSED_MESSAGE
+                    code, key = "credits", "paused"
                 elif "authentication" in text or "api-key" in text or "api_key" in text:
-                    code, message = "auth", "The demo is misconfigured. The owner has been notified in the logs."
+                    code, key = "auth", "auth"
                 else:
-                    code, message = "other", "The review could not finish. Try again in a minute."
-                events.put({"type": "error", "code": code, "message": message})
+                    code, key = "other", "other"
+                events.put({"type": "error", "code": code, "message": message(key, lang)})
             finally:
                 events.put(None)
 

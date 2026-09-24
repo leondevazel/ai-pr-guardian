@@ -229,3 +229,20 @@ def test_stages_are_announced_in_order():
 def test_no_callback_means_no_change_in_behaviour():
     client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
     assert review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: []).decision == "block"
+
+
+# --- output language: Korean readers get Korean prose, code stays as written ---
+
+
+def test_korean_review_asks_every_writer_for_korean_prose():
+    client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
+    review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [], language="ko")
+
+    writers = [c for c in client.calls if "REBUTTAL" not in c["system"]]
+    assert writers and all("Korean" in c["system"] for c in writers)
+
+
+def test_english_prompts_are_unchanged_from_the_benchmarked_ones():
+    client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
+    review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [])
+    assert not any("Korean" in c["system"] for c in client.calls)

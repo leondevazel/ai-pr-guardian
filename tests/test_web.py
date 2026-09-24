@@ -81,7 +81,7 @@ def test_guard_resets_on_a_new_day():
 # --- endpoints, with the review stubbed out: no API calls in tests ---
 
 
-def fake_review(diff_text, on_event):
+def fake_review(diff_text, on_event, language="en"):
     on_event({"type": "stage", "stage": "round1"})
     finding = Finding("security", "app/db.py", 1, "block", "SQL injection", "c", "e", 0.95)
     return Verdict("block", [finding], "Injection on line 1."), 0.012
@@ -140,7 +140,7 @@ def test_feedback_vote_must_be_up_or_down(client):
 # --- out of credits: a live portfolio demo must fail gracefully ---
 
 
-def out_of_credits(diff_text, on_event):
+def out_of_credits(diff_text, on_event, language="en"):
     raise RuntimeError("Error code: 400 - Your credit balance is too low to access the Anthropic API.")
 
 
@@ -170,7 +170,7 @@ def test_default_daily_budget_protects_a_five_dollar_balance():
     assert DEFAULT_DAILY_BUDGET_USD <= 0.5
 
 
-def bad_key(diff_text, on_event):
+def bad_key(diff_text, on_event, language="en"):
     raise RuntimeError("Error code: 401 - authentication_error: invalid x-api-key")
 
 
@@ -185,3 +185,33 @@ def test_errors_are_logged_on_the_server(tmp_path, caplog):
     app = create_app(review_fn=bad_key, data_dir=tmp_path, guard=UsageGuard(5, 1.0))
     TestClient(app).post("/api/review", json={"diff": DIFF})
     assert "invalid x-api-key" in caplog.text
+
+
+# --- Korean ---
+
+
+def test_korean_validation_message(client):
+    response = client.post("/api/review", json={"diff": "not a diff", "lang": "ko"})
+    assert response.status_code == 400
+    assert "unified diff 형식" in response.json()["detail"]
+
+
+def test_korean_request_reaches_the_reviewers(tmp_path):
+    seen = {}
+
+    def review(diff_text, on_event, language="en"):
+        seen["language"] = language
+        return Verdict("approve", [], ""), 0.0
+
+    app = create_app(review_fn=review, data_dir=tmp_path, guard=UsageGuard(5, 1.0))
+    TestClient(app).post("/api/review", json={"diff": DIFF, "lang": "ko"})
+    assert seen["language"] == "ko"
+
+
+def test_unsupported_language_is_rejected(client):
+    assert client.post("/api/review", json={"diff": DIFF, "lang": "fr"}).status_code == 422
+
+
+def test_korean_pause_message(broke_client):
+    events = events_of(broke_client.post("/api/review", json={"diff": DIFF, "lang": "ko"}))
+    assert "일시 중지" in events[-1]["message"]

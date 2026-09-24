@@ -201,3 +201,31 @@ def test_security_findings_stay_in_the_blocking_list():
     assert verdict.decision == "block"
     assert [f.agent for f in verdict.findings] == ["security"]
     assert verdict.advisory == []
+
+
+# --- progress events: the website streams the debate as it happens ---
+
+
+def test_emits_each_agents_first_round_findings():
+    events = []
+    client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
+    review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [], on_event=events.append)
+
+    round1 = [e for e in events if e["type"] == "findings" and e["round"] == 1]
+    assert sorted(e["agent"] for e in round1) == ["architecture", "business_logic", "security"]
+    security = next(e for e in round1 if e["agent"] == "security")
+    assert security["findings"][0]["category"] == "sql-injection"
+
+
+def test_stages_are_announced_in_order():
+    events = []
+    client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
+    review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: [], on_event=events.append)
+
+    stages = [e["stage"] for e in events if e["type"] == "stage"]
+    assert stages == ["round1", "rebuttal", "chief"]
+
+
+def test_no_callback_means_no_change_in_behaviour():
+    client = ScriptedClient(round1={"security": findings_json({})}, chief=CHIEF_KEEPS_ALL)
+    assert review_pr(REPO, SAMPLE_DIFF, client, run_semgrep=lambda *_: []).decision == "block"

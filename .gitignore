@@ -10,3 +10,6 @@ benchmark/results/
 benchmark_run.log
 *.egg-info/
 benchmark/dataset/files/
+web/data/
+build_v2.log
+benchmark/dataset-v1/

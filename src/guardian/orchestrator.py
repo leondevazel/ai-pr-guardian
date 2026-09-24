@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict
 
 from guardian.agents.architecture import ArchitectureAgent
 from guardian.agents.business_logic import BusinessLogicAgent
@@ -34,25 +35,38 @@ def decide_on_all(findings: list[Finding]) -> Decision:
     return "approve"
 
 
-def review_pr(repo_path: str, diff_text: str, client, run_semgrep=_run_semgrep) -> Verdict:
+def review_pr(
+    repo_path: str, diff_text: str, client, run_semgrep=_run_semgrep, on_event=None
+) -> Verdict:
     ctx = parse_diff(diff_text)
     changed_files = [f.path for f in ctx.files]
     tools = run_semgrep(repo_path, changed_files)
     contexts = _repo_contexts(repo_path, ctx)
 
     agents = [cls(client) for cls in AGENT_CLASSES]
+    emit = on_event or (lambda event: None)
 
+    def reviewed(agent):
+        found = agent.review(ctx, tools, contexts)
+        emit(_findings_event(1, agent.name, found))
+        return found
+
+    def rebutted(pair):
+        agent, own = pair
+        adjusted = agent.rebut(own, _peers_on_same_files(own, round1, agent.name))
+        if own:
+            emit(_findings_event(2, agent.name, adjusted))
+        return adjusted
+
+    emit({"type": "stage", "stage": "round1"})
     with ThreadPoolExecutor(max_workers=len(agents)) as pool:
-        round1 = list(pool.map(lambda a: a.review(ctx, tools, contexts), agents))
+        round1 = list(pool.map(reviewed, agents))
 
+    emit({"type": "stage", "stage": "rebuttal"})
     with ThreadPoolExecutor(max_workers=len(agents)) as pool:
-        round2 = list(
-            pool.map(
-                lambda pair: pair[0].rebut(pair[1], _peers_on_same_files(pair[1], round1, pair[0].name)),
-                zip(agents, round1),
-            )
-        )
+        round2 = list(pool.map(rebutted, zip(agents, round1)))
 
+    emit({"type": "stage", "stage": "chief"})
     all_findings = [f for group in round2 for f in group]
     kept, rationale = ChiefReviewer(client).select(all_findings)
     kept.sort(key=lambda f: (_severity_rank(f.severity), -f.confidence))
@@ -63,6 +77,15 @@ def review_pr(repo_path: str, diff_text: str, client, run_semgrep=_run_semgrep) 
     return Verdict(
         decision=decide(blocking), findings=blocking, advisory=advisory, rationale=rationale
     )
+
+
+def _findings_event(round_number: int, agent: str, findings: list[Finding]) -> dict:
+    return {
+        "type": "findings",
+        "round": round_number,
+        "agent": agent,
+        "findings": [asdict(f) for f in findings],
+    }
 
 
 def _repo_contexts(repo_path: str, ctx) -> list:

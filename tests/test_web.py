@@ -135,3 +135,36 @@ def test_feedback_vote_must_be_up_or_down(client):
         "/api/feedback", json={"review_id": verdict["review_id"], "finding": 0, "vote": "maybe"}
     )
     assert response.status_code == 422
+
+
+# --- out of credits: a live portfolio demo must fail gracefully ---
+
+
+def out_of_credits(diff_text, on_event):
+    raise RuntimeError("Error code: 400 - Your credit balance is too low to access the Anthropic API.")
+
+
+@pytest.fixture
+def broke_client(tmp_path):
+    app = create_app(review_fn=out_of_credits, data_dir=tmp_path, guard=UsageGuard(5, 1.0))
+    return TestClient(app)
+
+
+def test_running_out_of_credits_shows_a_plain_message(broke_client):
+    events = events_of(broke_client.post("/api/review", json={"diff": DIFF}))
+    assert events[-1]["type"] == "error"
+    assert "paused" in events[-1]["message"]
+    assert "BadRequest" not in events[-1]["message"]
+    assert "RuntimeError" not in events[-1]["message"]
+
+
+def test_after_credits_run_out_later_visitors_are_told_before_waiting(broke_client):
+    broke_client.post("/api/review", json={"diff": DIFF})
+    second = broke_client.post("/api/review", json={"diff": DIFF})
+    assert second.status_code == 503
+    assert "paused" in second.json()["detail"]
+
+
+def test_default_daily_budget_protects_a_five_dollar_balance():
+    from web.app import DEFAULT_DAILY_BUDGET_USD
+    assert DEFAULT_DAILY_BUDGET_USD <= 0.5

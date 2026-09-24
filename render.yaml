@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: pr-guardian
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      # sync: false - Render prompts for the value in its dashboard; it is never stored in git.
+      - key: ANTHROPIC_API_KEY
+        sync: false

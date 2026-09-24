@@ -20,6 +20,12 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
 MAX_DIFF_LINES = 400
+# Sized for a $5 prepaid balance: even a bot hammering the site gets ten days, not five.
+DEFAULT_DAILY_BUDGET_USD = 0.5
+PAUSED_MESSAGE = (
+    "The live demo is paused because its review budget is used up. "
+    "The example pull request on GitHub shows a full review in the meantime."
+)
 PR_URL = re.compile(r"^https://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)/?$")
 STATIC = Path(__file__).parent / "static"
 
@@ -107,8 +113,11 @@ def default_fetch_pr(repo: str, number: int) -> str:
 def create_app(review_fn=default_review, fetch_pr=default_fetch_pr, data_dir=None, guard=None):
     data_dir = Path(data_dir or Path(__file__).parent / "data")
     data_dir.mkdir(parents=True, exist_ok=True)
-    guard = guard or UsageGuard(per_visitor=5, daily_budget_usd=1.0)
+    guard = guard or UsageGuard(per_visitor=5, daily_budget_usd=DEFAULT_DAILY_BUDGET_USD)
     reviews: dict[str, list[dict]] = {}
+    # Set once the API reports an empty balance, so later visitors hear it before waiting.
+    # ponytail: cleared only by a restart; redeploying after a top-up is the reset.
+    state = {"paused": False}
 
     app = FastAPI(title="AI PR Guardian")
 
@@ -131,6 +140,9 @@ def create_app(review_fn=default_review, fetch_pr=default_fetch_pr, data_dir=Non
         if problem := validate_diff(diff_text):
             raise HTTPException(400, problem)
 
+        if state["paused"]:
+            raise HTTPException(503, PAUSED_MESSAGE)
+
         visitor = request.client.host if request.client else "unknown"
         if problem := guard.check(visitor):
             raise HTTPException(429, problem)
@@ -149,7 +161,12 @@ def create_app(review_fn=default_review, fetch_pr=default_fetch_pr, data_dir=Non
                 events.put({"type": "verdict", "review_id": review_id, **asdict(verdict),
                             "cost_usd": round(cost, 4)})
             except Exception as error:  # surfaced to the page instead of hanging the stream
-                events.put({"type": "error", "message": f"Review failed: {error.__class__.__name__}"})
+                if "credit balance" in str(error).lower():
+                    state["paused"] = True
+                    message = PAUSED_MESSAGE
+                else:
+                    message = "The review could not finish. Try again in a minute."
+                events.put({"type": "error", "message": message})
             finally:
                 events.put(None)
 

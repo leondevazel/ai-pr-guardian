@@ -1,147 +1,103 @@
 [
   {
-    "id": "PYSEC-2020-35",
-    "repo": "django/django",
-    "commit": "eb31d845323618d688ad429479c6dda973056136",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2020-35.diff",
+    "id": "benign-ad263df5a4",
+    "repo": "tiangolo/fastapi",
+    "commit": "ad263df5a4a55f1fa0708158431cc5a0443014f2",
+    "diff_path": "benchmark/dataset/diffs/benign-ad263df5a4.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-c44a19af54",
+    "repo": "pallets/werkzeug",
+    "commit": "c44a19af54fb33cd5cbb4e654ffa28b824923449",
+    "diff_path": "benchmark/dataset/diffs/benign-c44a19af54.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-368550e054",
+    "repo": "tornadoweb/tornado",
+    "commit": "368550e0544525c25567614415110ec71d0add55",
+    "diff_path": "benchmark/dataset/diffs/benign-368550e054.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-cgfm-xwp7-2cvr",
+    "repo": "apostrophecms/sanitize-html",
+    "commit": "b4682c12fd30e12e82fa2d9b766de91d7d2cd23c",
+    "diff_path": "benchmark/dataset/diffs/GHSA-cgfm-xwp7-2cvr.diff",
     "is_vulnerable": true,
-    "cve_id": "CVE-2020-7471",
-    "category": ""
+    "cve_id": "CVE-2022-25887",
+    "category": "Sanitize-html Vulnerable To REDoS Attacks",
+    "split": "test"
   },
   {
-    "id": "benign-581deb9402",
-    "repo": "django/django",
-    "commit": "581deb9402edc70f85b63c170c199a393f0f2183",
-    "diff_path": "benchmark/dataset/diffs/benign-581deb9402.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "benign-d73fa1cdcb",
-    "repo": "pallets/flask",
-    "commit": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
-    "diff_path": "benchmark/dataset/diffs/benign-d73fa1cdcb.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "benign-8b01005729",
-    "repo": "aio-libs/aiohttp",
-    "commit": "8b0100572936df28977b9de8a6cc7e464c0b521e",
-    "diff_path": "benchmark/dataset/diffs/benign-8b01005729.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "benign-446d9cf602",
-    "repo": "django/django",
-    "commit": "446d9cf602a5c42862da118b714a5679bb61cf27",
-    "diff_path": "benchmark/dataset/diffs/benign-446d9cf602.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "benign-6ade625848",
-    "repo": "django/django",
-    "commit": "6ade6258480fba84a7e895b4b1e1716dfc954778",
-    "diff_path": "benchmark/dataset/diffs/benign-6ade625848.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "benign-6f66281a1d",
-    "repo": "psf/requests",
-    "commit": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
-    "diff_path": "benchmark/dataset/diffs/benign-6f66281a1d.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "PYSEC-2024-24",
-    "repo": "aio-libs/aiohttp",
-    "commit": "1c335944d6a8b1298baf179b7c0b3069f10c514b",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2024-24.diff",
+    "id": "GHSA-jchw-25xp-jwwc",
+    "repo": "follow-redirects/follow-redirects",
+    "commit": "7a6567e16dfa9ad18a70bfe91784c28653fbf19d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-jchw-25xp-jwwc.diff",
     "is_vulnerable": true,
-    "cve_id": "CVE-2024-23334",
-    "category": ""
+    "cve_id": "CVE-2023-26159",
+    "category": "Follow Redirects improperly handles URLs in the url.parse() function",
+    "split": "test"
   },
   {
-    "id": "OSV-2022-715",
-    "repo": "python-pillow/Pillow",
-    "commit": "9887544fafcd13cc8afcfa0c6d0f2e6facc1a8b8",
-    "diff_path": "benchmark/dataset/diffs/OSV-2022-715.diff",
+    "id": "GHSA-8423-8fgw-73vq",
+    "repo": "tornadoweb/tornado",
+    "commit": "de85b3f87446e323e881bbaa3d5a74f4b76e5f05",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8423-8fgw-73vq.diff",
     "is_vulnerable": true,
-    "cve_id": null,
-    "category": "Segv on unknown address in jpeg_read_scanlines"
+    "cve_id": "CVE-2026-91990",
+    "category": "tornado: multipart split() creates huge temp list before max_parts check -> memo",
+    "split": "dev"
   },
   {
-    "id": "benign-6f205ff422",
-    "repo": "requests/requests",
-    "commit": "6f205ff422bccd5e4c4fc0b64c5f3e7df5181db6",
-    "diff_path": "benchmark/dataset/diffs/benign-6f205ff422.diff",
+    "id": "GHSA-35p6-xmwp-9g52",
+    "repo": "nodejs/undici",
+    "commit": "6ea54ef8c4051e95bb68c89d4a5c9274fe6fbb4b",
+    "diff_path": "benchmark/dataset/diffs/GHSA-35p6-xmwp-9g52.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-6733",
+    "category": "undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-42h5-h8qh-vv9v",
+    "repo": "mlflow/mlflow",
+    "commit": "6e801f4259d96804c73107315b24cef0f6aa115a",
+    "diff_path": "benchmark/dataset/diffs/GHSA-42h5-h8qh-vv9v.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-2614",
+    "category": "MLflow allows an unauthenticated remote attacker to read arbitrary files from th",
+    "split": "test"
+  },
+  {
+    "id": "benign-56a5f1acdc",
+    "repo": "axios/axios",
+    "commit": "56a5f1acdc41965f464eb59bec6cc828113ba546",
+    "diff_path": "benchmark/dataset/diffs/benign-56a5f1acdc.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "dev"
   },
   {
-    "id": "PYSEC-2023-62",
-    "repo": "pallets/flask",
-    "commit": "70f906c51ce49c485f1d355703e9cc3386b1cc2b",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-62.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2023-30861",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2018-28",
-    "repo": "requests/requests",
-    "commit": "c45d7c49ea75133e52ab22a8e9e13173938e36ff",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2018-28.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2018-18074",
-    "category": ""
-  },
-  {
-    "id": "benign-7d67d37648",
-    "repo": "python-imaging/Pillow",
-    "commit": "7d67d3764871ebfb4cbbd04459eede0bbc37966e",
-    "diff_path": "benchmark/dataset/diffs/benign-7d67d37648.diff",
+    "id": "benign-9d89514951",
+    "repo": "apostrophecms/sanitize-html",
+    "commit": "9d89514951cab6f9e84790628a4873211ce472cf",
+    "diff_path": "benchmark/dataset/diffs/benign-9d89514951.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "benign-08ba4d0e0f",
-    "repo": "django/django",
-    "commit": "08ba4d0e0f62e322c6727596ee7a324465076a76",
-    "diff_path": "benchmark/dataset/diffs/benign-08ba4d0e0f.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
-  },
-  {
-    "id": "PYSEC-2016-15",
-    "repo": "django/django",
-    "commit": "c5544d289233f501917e25970c03ed444abbd4f0",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2016-15.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2016-2512",
-    "category": ""
-  },
-  {
-    "id": "benign-973540376e",
-    "repo": "python-pillow/Pillow",
-    "commit": "973540376e293b75381d04fe61f53daac3a665b8",
-    "diff_path": "benchmark/dataset/diffs/benign-973540376e.diff",
-    "is_vulnerable": false,
-    "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "test"
   },
   {
     "id": "benign-8dd3b26bf5",
@@ -150,52 +106,678 @@
     "diff_path": "benchmark/dataset/diffs/benign-8dd3b26bf5.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "test"
   },
   {
-    "id": "PYSEC-2022-304",
-    "repo": "django/django",
-    "commit": "5b6b257fa7ec37ff27965358800c67e2dd11c924",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2022-304.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2022-41323",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2014-22",
-    "repo": "python-imaging/Pillow",
-    "commit": "4e9f367dfd3f04c8f5d23f7f759ec12782e10ee7",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2014-22.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2014-1932",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2023-246",
-    "repo": "aio-libs/aiohttp",
-    "commit": "d5c12ba890557a575c313bb3017910d7616fce3d",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-246.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2023-47627",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2023-74",
-    "repo": "psf/requests",
-    "commit": "74ea7cf7a6a27a4eeb2ae24e162bcc942a6706d5",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-74.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2023-32681",
-    "category": ""
-  },
-  {
-    "id": "benign-a4cfece554",
-    "repo": "python-pillow/Pillow",
-    "commit": "a4cfece5546daf70745110fffdbc5bec10841c06",
-    "diff_path": "benchmark/dataset/diffs/benign-a4cfece554.diff",
+    "id": "benign-0c87604862",
+    "repo": "B-Step62/mlflow",
+    "commit": "0c8760486248478d8ed64e5b1e32aa1f28505063",
+    "diff_path": "benchmark/dataset/diffs/benign-0c87604862.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-346652939f",
+    "repo": "tornadoweb/tornado",
+    "commit": "346652939f3ee8c714c57e6091e4821ace38879b",
+    "diff_path": "benchmark/dataset/diffs/benign-346652939f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-2f271963a7",
+    "repo": "isaacs/node-tar",
+    "commit": "2f271963a7fe5a5960aee5dd6adf9647a1e266fd",
+    "diff_path": "benchmark/dataset/diffs/benign-2f271963a7.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-d7d87008a7",
+    "repo": "ansible-collections/community.general",
+    "commit": "d7d87008a789fcbf132705a27adfae6979a76506",
+    "diff_path": "benchmark/dataset/diffs/benign-d7d87008a7.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-jpvw-p8pr-9g2x",
+    "repo": "ansible/ansible",
+    "commit": "1e930684bc0a76ec3d094cd326738ad26416541c",
+    "diff_path": "benchmark/dataset/diffs/GHSA-jpvw-p8pr-9g2x.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2023-5115",
+    "category": "Ansible symlink attack vulnerability",
+    "split": "test"
+  },
+  {
+    "id": "benign-8145595e22",
+    "repo": "nodejs/undici",
+    "commit": "8145595e221779980d91ff611f14e5a984661388",
+    "diff_path": "benchmark/dataset/diffs/benign-8145595e22.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-f3cbe48670",
+    "repo": "nodejs/undici",
+    "commit": "f3cbe486706da6163b4ca226022e74df73168dd5",
+    "diff_path": "benchmark/dataset/diffs/benign-f3cbe48670.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-29vq-49wr-vm6x",
+    "repo": "pallets/werkzeug",
+    "commit": "f407712fdc60a09c2b3f4fe7db557703e5d9338d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-29vq-49wr-vm6x.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-27199",
+    "category": " Werkzeug safe_join() allows Windows special device names",
+    "split": "test"
+  },
+  {
+    "id": "benign-1d79fd9620",
+    "repo": "minimistjs/minimist",
+    "commit": "1d79fd9620f346fc2c5ff4f39f1541abdecc8c29",
+    "diff_path": "benchmark/dataset/diffs/benign-1d79fd9620.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-0547cd6c58",
+    "repo": "pallets/jinja",
+    "commit": "0547cd6c5871b3d2e1fa6eaaa9c1f3b5d3a2bd14",
+    "diff_path": "benchmark/dataset/diffs/benign-0547cd6c58.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-84703d15ec",
+    "repo": "apostrophecms/apostrophe",
+    "commit": "84703d15ecf8d623a2ead0c16ff994c03ec5198a",
+    "diff_path": "benchmark/dataset/diffs/benign-84703d15ec.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-hfg2-wf6j-x53p",
+    "repo": "sqlalchemy/sqlalchemy",
+    "commit": "51fea2e159ca93daa0bc8066a5c35d8436d99418",
+    "diff_path": "benchmark/dataset/diffs/GHSA-hfg2-wf6j-x53p.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2012-0805",
+    "category": "SQLAlchemy vulnerable to SQL injection",
+    "split": "dev"
+  },
+  {
+    "id": "benign-96911b01eb",
+    "repo": "twisted/twisted",
+    "commit": "96911b01eb3899f2c772def397cd7e84848b3a80",
+    "diff_path": "benchmark/dataset/diffs/benign-96911b01eb.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-2cd169f18d",
+    "repo": "apostrophecms/sanitize-html",
+    "commit": "2cd169f18d0e3f185530cd65031c9deb11b8a1ed",
+    "diff_path": "benchmark/dataset/diffs/benign-2cd169f18d.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-1f08daf162",
+    "repo": "Kludex/starlette",
+    "commit": "1f08daf1627c866a4244418ea6da673d272fc8bb",
+    "diff_path": "benchmark/dataset/diffs/benign-1f08daf162.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-6d4d899812",
+    "repo": "saltstack/salt",
+    "commit": "6d4d899812f93bb8b92729e90fef4495faca017c",
+    "diff_path": "benchmark/dataset/diffs/benign-6d4d899812.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-df1cd8dc09",
+    "repo": "isaacs/node-tar",
+    "commit": "df1cd8dc09cded47b00c4129698824b3986432ac",
+    "diff_path": "benchmark/dataset/diffs/benign-df1cd8dc09.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-62hf-57xw-28j9",
+    "repo": "axios/axios",
+    "commit": "85132ffba1a77609ea5d101c8a413dea7174932f",
+    "diff_path": "benchmark/dataset/diffs/GHSA-62hf-57xw-28j9.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-42039",
+    "category": "Axios: unbounded recursion in toFormData causes DoS via deeply nested request da",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-4grg-w6v8-c28g",
+    "repo": "pallets/flask",
+    "commit": "73d6504063bfa00666a92b07a28aaf906c532f09",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4grg-w6v8-c28g.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-47278",
+    "category": "Flask uses fallback key instead of current signing key",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-vp56-6g26-6827",
+    "repo": "node-fetch/node-fetch",
+    "commit": "28802387292baee467e042e168d92597b5bbbe3d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-vp56-6g26-6827.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-2596",
+    "category": "node-fetch Inefficient Regular Expression Complexity ",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-ghr5-ch3p-vcr6",
+    "repo": "mde/ejs",
+    "commit": "e469741dca7df2eb400199e1cdb74621e3f89aa5",
+    "diff_path": "benchmark/dataset/diffs/GHSA-ghr5-ch3p-vcr6.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-33883",
+    "category": "ejs lacks certain pollution protection",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-cpwx-vrp4-4pq7",
+    "repo": "pallets/jinja",
+    "commit": "90457bbf33b8662926ae65cdde4c4c32e756e403",
+    "diff_path": "benchmark/dataset/diffs/GHSA-cpwx-vrp4-4pq7.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-27516",
+    "category": "Jinja2 vulnerable to sandbox breakout through attr filter selecting format metho",
+    "split": "test"
+  },
+  {
+    "id": "benign-d9b89544e6",
+    "repo": "websockets/ws",
+    "commit": "d9b89544e627f2a260fb85a6f42c8ecba98d7615",
+    "diff_path": "benchmark/dataset/diffs/benign-d9b89544e6.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-gc5v-m9x4-r6x2",
+    "repo": "psf/requests",
+    "commit": "66d21cb07bd6255b1280291c4fafb71803cdb3b7",
+    "diff_path": "benchmark/dataset/diffs/GHSA-gc5v-m9x4-r6x2.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-25645",
+    "category": "Requests has Insecure Temp File Reuse in its extract_zipped_paths() utility func",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-q34m-jh98-gwm2",
+    "repo": "pallets/quart",
+    "commit": "5e78c4169b8eb66b91ead3e62d44721b9e1644ee",
+    "diff_path": "benchmark/dataset/diffs/GHSA-q34m-jh98-gwm2.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-49767",
+    "category": "Werkzeug possible resource exhaustion when parsing file data in forms",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-83g3-92jg-28cx",
+    "repo": "isaacs/node-tar",
+    "commit": "2cb1120bcefe28d7ecc719b41441ade59c52e384",
+    "diff_path": "benchmark/dataset/diffs/GHSA-83g3-92jg-28cx.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-26960",
+    "category": "Arbitrary File Read/Write via Hardlink Target Escape Through Symlink Chain in no",
+    "split": "test"
+  },
+  {
+    "id": "benign-c62fe52896",
+    "repo": "mde/ejs",
+    "commit": "c62fe52896017c3c1c0a9b0167e5a71facefb7c5",
+    "diff_path": "benchmark/dataset/diffs/benign-c62fe52896.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-8b3320d2a7",
+    "repo": "node-fetch/node-fetch",
+    "commit": "8b3320d2a7c07bce4afc6b2bf6c3bbddda85b01f",
+    "diff_path": "benchmark/dataset/diffs/benign-8b3320d2a7.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-g8qq-57p8-ggw5",
+    "repo": "apostrophecms/apostrophe",
+    "commit": "1135516a1a4a8f9638641c460488a43d8af20081",
+    "diff_path": "benchmark/dataset/diffs/GHSA-g8qq-57p8-ggw5.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-84371",
+    "category": "ApostropheCMS: Stored XSS via SVG SMIL URI-list scheme-policy bypass",
+    "split": "dev"
+  },
+  {
+    "id": "benign-57de5fa9c2",
+    "repo": "encode/starlette",
+    "commit": "57de5fa9c2a98089a78d32d560e9b23e62560d5f",
+    "diff_path": "benchmark/dataset/diffs/benign-57de5fa9c2.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-311b7f4c3b",
+    "repo": "apostrophecms/sanitize-html",
+    "commit": "311b7f4c3b3a457ca620303982a1d021df9dd341",
+    "diff_path": "benchmark/dataset/diffs/benign-311b7f4c3b.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-grgv-6hw6-v9g4",
+    "repo": "twisted/twisted",
+    "commit": "e11cd82bdd79b3ebbb0e8635cbb9c76df2b5af09",
+    "diff_path": "benchmark/dataset/diffs/GHSA-grgv-6hw6-v9g4.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-42304",
+    "category": "Twisted has a Denial of Service (DoS) in twisted.names via Crafted DNS Compressi",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-8h2j-cgx8-6xv7",
+    "repo": "tiangolo/fastapi",
+    "commit": "fa7e3c996edf2d5482fff8f9d890ac2390dede4d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8h2j-cgx8-6xv7.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-32677",
+    "category": "Cross-Site Request Forgery (CSRF) in FastAPI",
+    "split": "dev"
+  },
+  {
+    "id": "benign-7d67d37648",
+    "repo": "python-pillow/Pillow",
+    "commit": "7d67d3764871ebfb4cbbd04459eede0bbc37966e",
+    "diff_path": "benchmark/dataset/diffs/benign-7d67d37648.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-v8fg-2rw7-q452",
+    "repo": "sequelize/sequelize",
+    "commit": "5deadd2410ae9136a21fb652db206d27bb715f26",
+    "diff_path": "benchmark/dataset/diffs/GHSA-v8fg-2rw7-q452.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-69240",
+    "category": "Sequelize: SQL Injection (Oracle DB)",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-45hq-cxwh-f6vc",
+    "repo": "python-pillow/Pillow",
+    "commit": "0a263e6264aa5399988d9acd3bbfbca2ca3ec77d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-45hq-cxwh-f6vc.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-55379",
+    "category": "Pillow `BdfFontFile`: `Image.new()` called without `_decompression_bomb_check()`",
+    "split": "test"
+  },
+  {
+    "id": "benign-8328f505c8",
+    "repo": "mlflow/mlflow",
+    "commit": "8328f505c82dda30ef6d3cec9c9a79fa0129f86f",
+    "diff_path": "benchmark/dataset/diffs/benign-8328f505c8.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-7f3f-x5f5-79gw",
+    "repo": "saltstack/salt",
+    "commit": "9445f496fed61b15dc4364818007e5b765b0746f",
+    "diff_path": "benchmark/dataset/diffs/GHSA-7f3f-x5f5-79gw.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-22241",
+    "category": "Salt's file contents overwrite the VirtKey class",
+    "split": "test"
+  },
+  {
+    "id": "benign-eca4e1dc80",
+    "repo": "mlflow/mlflow",
+    "commit": "eca4e1dc801622666b0c97cb5f61845b49621902",
+    "diff_path": "benchmark/dataset/diffs/benign-eca4e1dc80.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-gmj6-6f8f-6699",
+    "repo": "pallets/jinja",
+    "commit": "767b23617628419ae3709ccfb02f9602ae9fe51f",
+    "diff_path": "benchmark/dataset/diffs/GHSA-gmj6-6f8f-6699.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-56201",
+    "category": "Jinja has a sandbox breakout through malicious filenames",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-r4q5-vmmm-2653",
+    "repo": "follow-redirects/follow-redirects",
+    "commit": "844c4d302ac963d29bdb5dc1754ec7df3d70d7f9",
+    "diff_path": "benchmark/dataset/diffs/GHSA-r4q5-vmmm-2653.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-40895",
+    "category": "follow-redirects leaks Custom Authentication Headers to Cross-Domain Redirect Ta",
+    "split": "test"
+  },
+  {
+    "id": "benign-0d415f34f8",
+    "repo": "ljharb/qs",
+    "commit": "0d415f34f8c6d16cec1497d16538f47152b92da2",
+    "diff_path": "benchmark/dataset/diffs/benign-0d415f34f8.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-cmwx-9m2h-x7v4",
+    "repo": "ansible/ansible-modules-core",
+    "commit": "1182d1f0b76d56f3667e27987a10b9ec8f03357d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-cmwx-9m2h-x7v4.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2016-8614",
+    "category": "Ansible apt_key module does not properly verify key fingerprint",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-vg7j-7cwx-8wgw",
+    "repo": "Automattic/mongoose",
+    "commit": "64a9f9706f2428c49e0cfb8e223065acc645f7bc",
+    "diff_path": "benchmark/dataset/diffs/GHSA-vg7j-7cwx-8wgw.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-23061",
+    "category": "Mongoose search injection vulnerability",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-f8q4-jwww-x3wv",
+    "repo": "paramiko/paramiko",
+    "commit": "4c491e299c9b800358b16fa4886d8d94f45abe2e",
+    "diff_path": "benchmark/dataset/diffs/GHSA-f8q4-jwww-x3wv.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-24302",
+    "category": "Race Condition in Paramiko",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-8xcm-r25x-g524",
+    "repo": "nodejs/undici",
+    "commit": "1b5a5312c3a7d7a30c31bf0d000b39a8a2531e1c",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8xcm-r25x-g524.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-16728",
+    "category": "undici vulnerable to downstream response desynchronization via retry interceptor",
+    "split": "dev"
+  },
+  {
+    "id": "benign-240c0ae650",
+    "repo": "ansible/ansible-modules-extras",
+    "commit": "240c0ae65040df01192f9168e79fa67cb361fab5",
+    "diff_path": "benchmark/dataset/diffs/benign-240c0ae650.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-fdbb909cf9",
+    "repo": "minimistjs/minimist",
+    "commit": "fdbb909cf916b3bac9f76f6ee72c64e05b73c2d9",
+    "diff_path": "benchmark/dataset/diffs/benign-fdbb909cf9.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-31a1abf2d6",
+    "repo": "follow-redirects/follow-redirects",
+    "commit": "31a1abf2d659ac1c8fcbe7e614a8c8914d80e1e3",
+    "diff_path": "benchmark/dataset/diffs/benign-31a1abf2d6.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-6048fa4875",
+    "repo": "pallets/werkzeug",
+    "commit": "6048fa48753c7b61e35cc34537667809dee8fa35",
+    "diff_path": "benchmark/dataset/diffs/benign-6048fa4875.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-b757b8da84",
+    "repo": "saltstack/salt",
+    "commit": "b757b8da847a4013a5ff493969f15d6834f02999",
+    "diff_path": "benchmark/dataset/diffs/benign-b757b8da84.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-9a34acf03c",
+    "repo": "expressjs/express",
+    "commit": "9a34acf03cb818ff3f8bc40e44176e277a25cbb9",
+    "diff_path": "benchmark/dataset/diffs/benign-9a34acf03c.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-86qp-5c8j-p5mr",
+    "repo": "Kludex/starlette",
+    "commit": "764dab0dcfb9033d75442d7a359645c9f94648c6",
+    "diff_path": "benchmark/dataset/diffs/GHSA-86qp-5c8j-p5mr.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-48710",
+    "category": "Starlette has missing Host header validation that poisons request.url.path, bypa",
+    "split": "test"
+  },
+  {
+    "id": "benign-8a28622487",
+    "repo": "apostrophecms/apostrophe",
+    "commit": "8a2862248776a8bacb34b60ed7573605c0c8e733",
+    "diff_path": "benchmark/dataset/diffs/benign-8a28622487.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-qw6h-vgh9-j6wx",
+    "repo": "expressjs/express",
+    "commit": "54271f69b511fea198471e6ff3400ab805d6b553",
+    "diff_path": "benchmark/dataset/diffs/GHSA-qw6h-vgh9-j6wx.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-43796",
+    "category": "express vulnerable to XSS via response.redirect()",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-4cwx-7wf7-3272",
+    "repo": "nodejs/undici",
+    "commit": "4fe5bc5fefe5ac81a200fc8e1cf84b8bf8464451",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4cwx-7wf7-3272.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-13697",
+    "category": "undici vulnerable to cross-user information disclosure and parse-time crash via ",
+    "split": "dev"
+  },
+  {
+    "id": "benign-91d333b4cf",
+    "repo": "expressjs/express",
+    "commit": "91d333b4cfea158c9798d32e6665d36bd8e37c3d",
+    "diff_path": "benchmark/dataset/diffs/benign-91d333b4cf.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-afc7d2fd5d",
+    "repo": "benoitc/gunicorn",
+    "commit": "afc7d2fd5dd9f1de455b1be6c10044030c0adf8e",
+    "diff_path": "benchmark/dataset/diffs/benign-afc7d2fd5d.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-cd4f213660",
+    "repo": "scrapy/scrapy",
+    "commit": "cd4f213660831caac9314ff65d646704bc900138",
+    "diff_path": "benchmark/dataset/diffs/benign-cd4f213660.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-02ea048903",
+    "repo": "saltstack/salt",
+    "commit": "02ea048903f17dbd0dc15688ce6fde1025fa4313",
+    "diff_path": "benchmark/dataset/diffs/benign-02ea048903.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-6f66281a1d",
+    "repo": "psf/requests",
+    "commit": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+    "diff_path": "benchmark/dataset/diffs/benign-6f66281a1d.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-jxwj-j7wr-gfrw",
+    "repo": "apostrophecms/apostrophe",
+    "commit": "eae1fb2b72ec5d1c27d0977509c6482a0408f725",
+    "diff_path": "benchmark/dataset/diffs/GHSA-jxwj-j7wr-gfrw.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-63670",
+    "category": "ApostropheCMS: Mutation-XSS / allowedTags bypass via literal `</textarea/>` soli",
+    "split": "dev"
+  },
+  {
+    "id": "benign-4fe55eb264",
+    "repo": "encode/starlette",
+    "commit": "4fe55eb2649e74fb01472bad9a1bc54fc3495904",
+    "diff_path": "benchmark/dataset/diffs/benign-4fe55eb264.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-68rp-wp8r-4726",
+    "repo": "pallets/flask",
+    "commit": "089cb86dd22bff589a4eafb7ab8e42dc357623b4",
+    "diff_path": "benchmark/dataset/diffs/GHSA-68rp-wp8r-4726.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-27205",
+    "category": "Flask session does not add `Vary: Cookie` header when accessed in some ways",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-8hfj-j24r-96c4",
+    "repo": "moment/moment",
+    "commit": "4211bfc8f15746be4019bba557e29a7ba83d54c5",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8hfj-j24r-96c4.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-24785",
+    "category": "Path Traversal: 'dir/../../filename' in moment.locale",
+    "split": "test"
+  },
+  {
+    "id": "benign-8b01005729",
+    "repo": "aio-libs/aiohttp",
+    "commit": "8b0100572936df28977b9de8a6cc7e464c0b521e",
+    "diff_path": "benchmark/dataset/diffs/benign-8b01005729.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-7b86e946b0",
+    "repo": "node-fetch/node-fetch",
+    "commit": "7b86e946b02dfdd28f4f8fca3d73a022cbb5ca1e",
+    "diff_path": "benchmark/dataset/diffs/benign-7b86e946b0.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
   },
   {
     "id": "benign-935edaa91b",
@@ -204,141 +786,1197 @@
     "diff_path": "benchmark/dataset/diffs/benign-935edaa91b.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "dev"
   },
   {
-    "id": "OSV-2022-1074",
-    "repo": "python-pillow/Pillow",
-    "commit": "f7363c1091c70356d92e56abfca6b65bef9e7b26",
-    "diff_path": "benchmark/dataset/diffs/OSV-2022-1074.diff",
-    "is_vulnerable": true,
-    "cve_id": null,
-    "category": "Invalid-free in _dealloc"
-  },
-  {
-    "id": "benign-3bc82f0e92",
-    "repo": "python-pillow/Pillow",
-    "commit": "3bc82f0e92180fd2bb44952ae6a181ea05fb1d02",
-    "diff_path": "benchmark/dataset/diffs/benign-3bc82f0e92.diff",
+    "id": "benign-d318b68347",
+    "repo": "pallets/flask",
+    "commit": "d318b683471101618febed18996405ad26462110",
+    "diff_path": "benchmark/dataset/diffs/benign-d318b68347.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "dev"
   },
   {
-    "id": "PYSEC-2023-227",
-    "repo": "python-pillow/Pillow",
-    "commit": "1fe1bb49c452b0318cad12ea9d97c3bef188e9a7",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-227.diff",
+    "id": "GHSA-vv2x-vrpj-qqpq",
+    "repo": "mozilla/bleach",
+    "commit": "79b7a3c5e56a09d1d323a5006afa59b56162eb13",
+    "diff_path": "benchmark/dataset/diffs/GHSA-vv2x-vrpj-qqpq.diff",
     "is_vulnerable": true,
-    "cve_id": "CVE-2023-44271",
-    "category": ""
+    "cve_id": "CVE-2021-23980",
+    "category": "Cross-site scripting in Bleach",
+    "split": "dev"
+  },
+  {
+    "id": "benign-863ed94055",
+    "repo": "moment/moment",
+    "commit": "863ed940556e6e63c43de23981a4853036a003ac",
+    "diff_path": "benchmark/dataset/diffs/benign-863ed94055.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-8q59-q68h-6hv4",
+    "repo": "yaml/pyyaml",
+    "commit": "a001f2782501ad2d24986959f0239a354675f9dc",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8q59-q68h-6hv4.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2020-14343",
+    "category": "Improper Input Validation in PyYAML",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-rv95-896h-c2vc",
+    "repo": "expressjs/express",
+    "commit": "0867302ddbde0e9463d0564fea5861feb708c2dd",
+    "diff_path": "benchmark/dataset/diffs/GHSA-rv95-896h-c2vc.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-29041",
+    "category": "Express.js Open Redirect in malformed URLs",
+    "split": "test"
+  },
+  {
+    "id": "PYSEC-2017-71",
+    "repo": "twangboy/salt",
+    "commit": "c0689e32154c41f59840ae10ffc5fbfa30618710",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2017-71.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2015-6941",
+    "category": "",
+    "split": "dev"
+  },
+  {
+    "id": "benign-96b89060cf",
+    "repo": "auth0/node-jsonwebtoken",
+    "commit": "96b89060cfc19272a7d853f53cb28c42580a6a67",
+    "diff_path": "benchmark/dataset/diffs/benign-96b89060cf.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-mpf4-983q-p7j4",
+    "repo": "tornadoweb/tornado",
+    "commit": "8d6363ed7b69d5f0da806efe34d256627a2191de",
+    "diff_path": "benchmark/dataset/diffs/GHSA-mpf4-983q-p7j4.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-82397",
+    "category": " Tornado: Urlencoded body parsing omits max_num_fields, so one request can stall",
+    "split": "test"
+  },
+  {
+    "id": "benign-1190afd14f",
+    "repo": "psf/requests",
+    "commit": "1190afd14fca74292946d62c4c8169880a47ff67",
+    "diff_path": "benchmark/dataset/diffs/benign-1190afd14f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-4rrr-2h4v-f3j9",
+    "repo": "django/django",
+    "commit": "a33540b3e20b5d759aa8b2e4b9ca0e8edd285344",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4rrr-2h4v-f3j9.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-1285",
+    "category": "Django has Inefficient Algorithmic Complexity",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-6c3j-c64m-qhgq",
+    "repo": "maximebf/php-debugbar",
+    "commit": "847216e60544258c881f2733d699bbcfeefac0fc",
+    "diff_path": "benchmark/dataset/diffs/GHSA-6c3j-c64m-qhgq.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2019-11358",
+    "category": "XSS in jQuery as used in Drupal, Backdrop CMS, and other products",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-3jfq-g458-7qm9",
+    "repo": "npm/node-tar",
+    "commit": "1f036ca23f64a547bdd6c79c1a44bc62e8115da4",
+    "diff_path": "benchmark/dataset/diffs/GHSA-3jfq-g458-7qm9.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-32804",
+    "category": "Arbitrary File Creation/Overwrite due to insufficient absolute path sanitization",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-3h9f-r86x-qvjx",
+    "repo": "django/django",
+    "commit": "64f9a2b2283fde3ec69fb0dfe441cf0f6f411ba3",
+    "diff_path": "benchmark/dataset/diffs/GHSA-3h9f-r86x-qvjx.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-48588",
+    "category": "Django: cache middleware may expose private responses when unrelated request coo",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-4qqq-9vqf-3h3f",
+    "repo": "scrapy/scrapy",
+    "commit": "1d0502f25bbe55a22899af915623fda1aaeb9dd8",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4qqq-9vqf-3h3f.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-1968",
+    "category": "Scrapy leaks the authorization header on same-domain but cross-origin redirects",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-46r5-x6jq-v8g6",
+    "repo": "mlflow/mlflow",
+    "commit": "005b959cacda05d1423356cfcbd9ebeda8ff96a7",
+    "diff_path": "benchmark/dataset/diffs/GHSA-46r5-x6jq-v8g6.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-33866",
+    "category": "MLflow is vulnerable to an authorization bypass affecting the AJAX endpoint",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-4mjr-xmp4-gh2g",
+    "repo": "ljharb/qs",
+    "commit": "e83d321ffafb38cf210683ac31714fce6ce1c6c6",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4mjr-xmp4-gh2g.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-82417",
+    "category": "qs: Denial of Service via Attacker Controlled isBuffer",
+    "split": "dev"
+  },
+  {
+    "id": "benign-458ca8e19f",
+    "repo": "follow-redirects/follow-redirects",
+    "commit": "458ca8e19fd80897e97746e476d7389cdf9b6494",
+    "diff_path": "benchmark/dataset/diffs/benign-458ca8e19f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-f96h-pmfr-66vw",
+    "repo": "encode/starlette",
+    "commit": "fd038f3070c302bff17ef7d173dbb0b007617733",
+    "diff_path": "benchmark/dataset/diffs/GHSA-f96h-pmfr-66vw.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-47874",
+    "category": "Starlette Denial of service (DoS) via multipart/form-data",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-phwq-j96m-2c2q",
+    "repo": "mde/ejs",
+    "commit": "15ee698583c98dadc456639d6245580d17a24baf",
+    "diff_path": "benchmark/dataset/diffs/GHSA-phwq-j96m-2c2q.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-29078",
+    "category": "ejs template injection vulnerability",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-78cv-mqj4-43f7",
+    "repo": "tornadoweb/tornado",
+    "commit": "24a2d96ea115f663b223887deb0060f13974c104",
+    "diff_path": "benchmark/dataset/diffs/GHSA-78cv-mqj4-43f7.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-35536",
+    "category": "Tornado has incomplete validation of cookie attributes",
+    "split": "dev"
+  },
+  {
+    "id": "benign-9c8692ae05",
+    "repo": "npm/node-semver",
+    "commit": "9c8692ae05416e9dbe88d95ffe2b80e6964550fe",
+    "diff_path": "benchmark/dataset/diffs/benign-9c8692ae05.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-23hp-3jrh-7fpw",
+    "repo": "isaacs/node-tar",
+    "commit": "2812e9338665659b183aa7226518c307044957d3",
+    "diff_path": "benchmark/dataset/diffs/GHSA-23hp-3jrh-7fpw.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-59873",
+    "category": "node-tar: Decompression/parse DoS via unlimited input",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-3wq7-rqq7-wx6j",
+    "repo": "aio-libs/aiohttp",
+    "commit": "cbb774f38330563422ca0c413a71021d7b944145",
+    "diff_path": "benchmark/dataset/diffs/GHSA-3wq7-rqq7-wx6j.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-34517",
+    "category": "AIOHTTP has late size enforcement for non-file multipart fields causes memory Do",
+    "split": "test"
+  },
+  {
+    "id": "benign-d4e2c0c5c9",
+    "repo": "tornadoweb/tornado",
+    "commit": "d4e2c0c5c943ec3f59c221807404cd303a0914eb",
+    "diff_path": "benchmark/dataset/diffs/benign-d4e2c0c5c9.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-8ggh-xwr9-3373",
+    "repo": "ansible-collections/community.general",
+    "commit": "08e56bbb9b57740a879d3057d84cdb02a162b840",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8ggh-xwr9-3373.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-14010",
+    "category": "Ansible Community General Collection is vulnerable to exposure of sensitive info",
+    "split": "test"
+  },
+  {
+    "id": "benign-574565b1ef",
+    "repo": "mitsuhiko/jinja2",
+    "commit": "574565b1ef026155006b1129afb2d405e3bc16c3",
+    "diff_path": "benchmark/dataset/diffs/benign-574565b1ef.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-aaf2af36ec",
+    "repo": "socketio/socket.io",
+    "commit": "aaf2af36ec8ad05910f357a788e0e358bad32738",
+    "diff_path": "benchmark/dataset/diffs/benign-aaf2af36ec.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-fqh9-2qgg-h84h",
+    "repo": "mitsuhiko/jinja2",
+    "commit": "acb672b6a179567632e032f547582f30fa2f4aa7",
+    "diff_path": "benchmark/dataset/diffs/GHSA-fqh9-2qgg-h84h.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2014-0012",
+    "category": "Insecure Temporary File in Jinja2",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-6426-9fv3-65x8",
+    "repo": "django/django",
+    "commit": "005d60d97c4dfb117503bdb6f2facfcaf9315d84",
+    "diff_path": "benchmark/dataset/diffs/GHSA-6426-9fv3-65x8.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-1312",
+    "category": "Django has an SQL Injection issue",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-x4cm-m36h-c6qj",
+    "repo": "ansible/ansible-modules-core",
+    "commit": "30fb384e7fb9a94ac3929e4a650877e45d8834c9",
+    "diff_path": "benchmark/dataset/diffs/GHSA-x4cm-m36h-c6qj.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2016-8647",
+    "category": "Improper Input Validation in ansible",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-j44m-qm6p-hp7m",
+    "repo": "npm/node-tar",
+    "commit": "7ecef07da6a9e72cc0c4d0c9c6a8e85b6b52395d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-j44m-qm6p-hp7m.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2018-20834",
+    "category": "Arbitrary File Overwrite in tar",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-fxwf-4rqh-v8g3",
+    "repo": "socketio/socket.io",
+    "commit": "f78a575f66ab693c3ea96ea88429ddb1a44c86c7",
+    "diff_path": "benchmark/dataset/diffs/GHSA-fxwf-4rqh-v8g3.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2020-28481",
+    "category": "CORS misconfiguration in socket.io",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-32pc-xphx-q4f6",
+    "repo": "benoitc/gunicorn",
+    "commit": "1e10a02e73c87dfadc394b361af33864d0e59e24",
+    "diff_path": "benchmark/dataset/diffs/GHSA-32pc-xphx-q4f6.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2018-1000164",
+    "category": "Gunicorn contains Improper Neutralization of CRLF sequences in HTTP headers",
+    "split": "dev"
+  },
+  {
+    "id": "benign-6caff9e0d5",
+    "repo": "moment/moment",
+    "commit": "6caff9e0d54e85a63a6eb97d7361f1da35bc58f4",
+    "diff_path": "benchmark/dataset/diffs/benign-6caff9e0d5.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-8960fe0b29",
+    "repo": "python-pillow/Pillow",
+    "commit": "8960fe0b299f6fa9ed17fa66b50ad50f440d29f2",
+    "diff_path": "benchmark/dataset/diffs/benign-8960fe0b29.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-pg2w-x9wp-vw92",
+    "repo": "kennethreitz/requests",
+    "commit": "3bd8afbff29e50b38f889b2f688785a669b9aafc",
+    "diff_path": "benchmark/dataset/diffs/GHSA-pg2w-x9wp-vw92.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2015-2296",
+    "category": "Python Requests Session Fixation",
+    "split": "test"
+  },
+  {
+    "id": "benign-581deb9402",
+    "repo": "django/django",
+    "commit": "581deb9402edc70f85b63c170c199a393f0f2183",
+    "diff_path": "benchmark/dataset/diffs/benign-581deb9402.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-m7xq-9374-9rvx",
+    "repo": "Automattic/mongoose",
+    "commit": "33679bcf8ca43d74e3e8ecd4cc224826772d805b",
+    "diff_path": "benchmark/dataset/diffs/GHSA-m7xq-9374-9rvx.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-53900",
+    "category": "Mongoose search injection vulnerability",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-rrrm-qjm4-v8hf",
+    "repo": "markedjs/marked",
+    "commit": "c4a3ccd344b6929afa8a1d50ac54a721e57012c0",
+    "diff_path": "benchmark/dataset/diffs/GHSA-rrrm-qjm4-v8hf.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-21680",
+    "category": "Inefficient Regular Expression Complexity in marked",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-4x4j-2g7c-83w6",
+    "repo": "python-pillow/Pillow",
+    "commit": "8404ea5fe5df40fc34aa1e51403dd6fce0778b8a",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4x4j-2g7c-83w6.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-55798",
+    "category": "Pillow: WindowsViewer.get_command() OS command injection via unescaped shell pat",
+    "split": "dev"
+  },
+  {
+    "id": "benign-2269e9a08c",
+    "repo": "Kludex/starlette",
+    "commit": "2269e9a08c1edd3dfdea865710f40f84c857b623",
+    "diff_path": "benchmark/dataset/diffs/benign-2269e9a08c.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-1b89557177",
+    "repo": "markedjs/marked",
+    "commit": "1b89557177fe5a7d5d430fdc76e7c8a7c0adf6d7",
+    "diff_path": "benchmark/dataset/diffs/benign-1b89557177.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-34a9bf8235",
+    "repo": "yaml/pyyaml",
+    "commit": "34a9bf82357f4952d8f194a5a31f1c39743652d0",
+    "diff_path": "benchmark/dataset/diffs/benign-34a9bf8235.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-911bc94d22",
+    "repo": "urllib3/urllib3",
+    "commit": "911bc94d227519483c82e516e2bf10860396afd5",
+    "diff_path": "benchmark/dataset/diffs/benign-911bc94d22.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "PYSEC-2026-2281",
+    "repo": "Kludex/starlette",
+    "commit": "fd53168a7767b6b55ba5af787fd88f49e33cabc5",
+    "diff_path": "benchmark/dataset/diffs/PYSEC-2026-2281.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-48818",
+    "category": "",
+    "split": "test"
+  },
+  {
+    "id": "benign-b4a1a8ae8a",
+    "repo": "ansible-collections/community.general",
+    "commit": "b4a1a8ae8a71dbc1da4300cd26160f71c0192c3f",
+    "diff_path": "benchmark/dataset/diffs/benign-b4a1a8ae8a.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-wc69-rhjr-hc9g",
+    "repo": "moment/moment",
+    "commit": "9a3b5894f3d5d602948ac8a02e4ee528a49ca3a3",
+    "diff_path": "benchmark/dataset/diffs/GHSA-wc69-rhjr-hc9g.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-31129",
+    "category": "Moment.js vulnerable to Inefficient Regular Expression Complexity",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-25hc-qcg6-38wj",
+    "repo": "socketio/socket.io",
+    "commit": "15af22fc22bc6030fcead322c106f07640336115",
+    "diff_path": "benchmark/dataset/diffs/GHSA-25hc-qcg6-38wj.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-38355",
+    "category": "socket.io has an unhandled 'error' event",
+    "split": "test"
+  },
+  {
+    "id": "benign-5a910f1765",
+    "repo": "sequelize/sequelize",
+    "commit": "5a910f1765dc0c7518bc3d56b0890486be5a5f60",
+    "diff_path": "benchmark/dataset/diffs/benign-5a910f1765.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-xvch-5gv4-984h",
+    "repo": "minimistjs/minimist",
+    "commit": "34e20b8461118608703d6485326abbb8e35e1703",
+    "diff_path": "benchmark/dataset/diffs/GHSA-xvch-5gv4-984h.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-44906",
+    "category": "Prototype Pollution in minimist",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-q8mj-m7cp-5q26",
+    "repo": "ljharb/qs",
+    "commit": "21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41",
+    "diff_path": "benchmark/dataset/diffs/GHSA-q8mj-m7cp-5q26.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-8723",
+    "category": "qs has a remotely triggerable DoS: qs.stringify crashes with TypeError on null/u",
+    "split": "test"
+  },
+  {
+    "id": "benign-446d9cf602",
+    "repo": "django/django",
+    "commit": "446d9cf602a5c42862da118b714a5679bb61cf27",
+    "diff_path": "benchmark/dataset/diffs/benign-446d9cf602.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-4283a9675f",
+    "repo": "twangboy/salt",
+    "commit": "4283a9675f818d8f051efb29550d8bc205518ab0",
+    "diff_path": "benchmark/dataset/diffs/benign-4283a9675f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-631ae59121",
+    "repo": "npm/node-tar",
+    "commit": "631ae59121bf8fc8a22bbae35f074cb9b789cd4a",
+    "diff_path": "benchmark/dataset/diffs/benign-631ae59121.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
   },
   {
     "id": "benign-0449619777",
-    "repo": "python-pillow/Pillow",
+    "repo": "python-imaging/Pillow",
     "commit": "0449619777bd9b3b0df8930fb6d2588c435fc094",
     "diff_path": "benchmark/dataset/diffs/benign-0449619777.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "test"
   },
   {
-    "id": "benign-8cbdd4a814",
-    "repo": "django/django",
-    "commit": "8cbdd4a814397f81adf0129288f32b615bd1f94f",
-    "diff_path": "benchmark/dataset/diffs/benign-8cbdd4a814.diff",
+    "id": "benign-d3e0222276",
+    "repo": "Automattic/mongoose",
+    "commit": "d3e0222276fe1d93e43d5034dd3d751abb2e146b",
+    "diff_path": "benchmark/dataset/diffs/benign-d3e0222276.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "dev"
   },
   {
-    "id": "benign-64edef37e7",
-    "repo": "django/django",
-    "commit": "64edef37e7b419dd584307d84650a192fb47dc4c",
-    "diff_path": "benchmark/dataset/diffs/benign-64edef37e7.diff",
+    "id": "benign-a666ba5910",
+    "repo": "lodash/lodash",
+    "commit": "a666ba591064c8011988275790ad7d625279f09c",
+    "diff_path": "benchmark/dataset/diffs/benign-a666ba5910.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "test"
   },
   {
-    "id": "PYSEC-2023-250",
+    "id": "benign-4548449315",
+    "repo": "ansible/ansible-modules-core",
+    "commit": "454844931508c20bea270b694f67663586715728",
+    "diff_path": "benchmark/dataset/diffs/benign-4548449315.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-8cf7-32gw-wr33",
+    "repo": "auth0/node-jsonwebtoken",
+    "commit": "e1fa9dcc12054a8681db4e6373da1b30cf7016e3",
+    "diff_path": "benchmark/dataset/diffs/GHSA-8cf7-32gw-wr33.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-23539",
+    "category": "jsonwebtoken unrestricted key type could lead to legacy keys usage ",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-xc6g-ggrc-qq4r",
+    "repo": "punkave/sanitize-html",
+    "commit": "5d205a1005ba0df80e21d8c64a15bb3accdb2403",
+    "diff_path": "benchmark/dataset/diffs/GHSA-xc6g-ggrc-qq4r.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2017-16016",
+    "category": "Cross-Site Scripting in sanitize-html",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-2c2j-9gv5-cj73",
+    "repo": "encode/starlette",
+    "commit": "9f7ec2eb512fcc3fe90b43cb9dd9e1d08696bec1",
+    "diff_path": "benchmark/dataset/diffs/GHSA-2c2j-9gv5-cj73.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-54121",
+    "category": "Starlette has possible denial-of-service vector when parsing large files in mult",
+    "split": "dev"
+  },
+  {
+    "id": "benign-a8d1ceed25",
+    "repo": "follow-redirects/follow-redirects",
+    "commit": "a8d1ceed257d46758f913ff555b4f7e1cd758627",
+    "diff_path": "benchmark/dataset/diffs/benign-a8d1ceed25.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-4a310b47a5",
+    "repo": "ljharb/qs",
+    "commit": "4a310b47a5e80d1d202406b6d10c9dabbda29357",
+    "diff_path": "benchmark/dataset/diffs/benign-4a310b47a5.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-rm97-x556-q36h",
+    "repo": "apostrophecms/sanitize-html",
+    "commit": "c5dbdf77fe8b836d3bf4554ea39edb45281ec0b4",
+    "diff_path": "benchmark/dataset/diffs/GHSA-rm97-x556-q36h.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-21501",
+    "category": "sanitize-html Information Exposure vulnerability",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-2vrm-gr82-f7m5",
     "repo": "aio-libs/aiohttp",
-    "commit": "1e86b777e61cf4eefc7d92fa57fa19dcc676013b",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-250.diff",
+    "commit": "9a6ada97e2c6cf1ce31727c6c9fcea17c21f6f06",
+    "diff_path": "benchmark/dataset/diffs/GHSA-2vrm-gr82-f7m5.diff",
     "is_vulnerable": true,
-    "cve_id": "CVE-2023-49081",
-    "category": ""
+    "cve_id": "CVE-2026-34514",
+    "category": "AIOHTTP has CRLF injection through multipart part content type header constructi",
+    "split": "dev"
   },
   {
-    "id": "PYSEC-2024-26",
-    "repo": "aio-libs/aiohttp",
-    "commit": "33ccdfb0a12690af5bb49bda2319ec0907fa7827",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2024-26.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2024-23829",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2016-16",
-    "repo": "django/django",
-    "commit": "67b46ba7016da2d259c1ecc7d666d11f5e1cfaab",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2016-16.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2016-2513",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2022-42980",
-    "repo": "python-pillow/Pillow",
-    "commit": "2444cddab2f83f28687c7c20871574acbb6dbcf3",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2022-42980.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2022-45199",
-    "category": ""
-  },
-  {
-    "id": "PYSEC-2015-17",
-    "repo": "kennethreitz/requests",
-    "commit": "3bd8afbff29e50b38f889b2f688785a669b9aafc",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2015-17.diff",
-    "is_vulnerable": true,
-    "cve_id": "CVE-2015-2296",
-    "category": ""
-  },
-  {
-    "id": "benign-fb32a564cc",
-    "repo": "django/django",
-    "commit": "fb32a564ccc6f91d4b7594f5707c62fab0c11c04",
-    "diff_path": "benchmark/dataset/diffs/benign-fb32a564cc.diff",
+    "id": "benign-1d4ea0a883",
+    "repo": "nodejs/undici",
+    "commit": "1d4ea0a883bf33275d00c4db55377892180b2747",
+    "diff_path": "benchmark/dataset/diffs/benign-1d4ea0a883.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "test"
   },
   {
-    "id": "PYSEC-2016-2",
-    "repo": "django/django",
-    "commit": "d03bf6fe4e9bf5b07de62c1a271c4b41a7d3d158",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2016-2.diff",
+    "id": "GHSA-58qx-3vcg-4xpx",
+    "repo": "websockets/ws",
+    "commit": "c0327ec15a54d701eb6ccefaa8bef328cfc03086",
+    "diff_path": "benchmark/dataset/diffs/GHSA-58qx-3vcg-4xpx.diff",
     "is_vulnerable": true,
-    "cve_id": "CVE-2016-6186",
-    "category": ""
+    "cve_id": "CVE-2026-45736",
+    "category": "ws: Uninitialized memory disclosure",
+    "split": "test"
   },
   {
-    "id": "PYSEC-2023-247",
-    "repo": "aio-libs/aiohttp",
-    "commit": "f016f0680e4ace6742b03a70cb0382ce86abe371",
-    "diff_path": "benchmark/dataset/diffs/PYSEC-2023-247.diff",
+    "id": "GHSA-cxjh-pqwp-8mfp",
+    "repo": "follow-redirects/follow-redirects",
+    "commit": "c4f847f85176991f95ab9c88af63b1294de8649b",
+    "diff_path": "benchmark/dataset/diffs/GHSA-cxjh-pqwp-8mfp.diff",
     "is_vulnerable": true,
-    "cve_id": "CVE-2023-47641",
-    "category": ""
+    "cve_id": "CVE-2024-28849",
+    "category": "follow-redirects' Proxy-Authorization header kept across hosts",
+    "split": "test"
   },
   {
-    "id": "benign-2970eeef7c",
-    "repo": "python-pillow/Pillow",
-    "commit": "2970eeef7c88bcf05fe6a36bb780d79d396b4817",
-    "diff_path": "benchmark/dataset/diffs/benign-2970eeef7c.diff",
+    "id": "benign-ae4e8a2670",
+    "repo": "mozilla/bleach",
+    "commit": "ae4e8a26706516ad01b92e66321b480208a440da",
+    "diff_path": "benchmark/dataset/diffs/benign-ae4e8a2670.diff",
     "is_vulnerable": false,
     "cve_id": null,
-    "category": null
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-9e78bf058b",
+    "repo": "npm/node-tar",
+    "commit": "9e78bf058b2c22dd4d52e00d8922d5c06fc2f7b5",
+    "diff_path": "benchmark/dataset/diffs/benign-9e78bf058b.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-w7fw-mjwx-w883",
+    "repo": "ljharb/qs",
+    "commit": "f6a7abff1f13d644db9b05fe4f2c98ada6bf8482",
+    "diff_path": "benchmark/dataset/diffs/GHSA-w7fw-mjwx-w883.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-2391",
+    "category": "qs's arrayLimit bypass in comma parsing allows denial of service",
+    "split": "test"
+  },
+  {
+    "id": "benign-e97a20eaa6",
+    "repo": "websockets/ws",
+    "commit": "e97a20eaa6f2ad7969419eed732a506453251eb9",
+    "diff_path": "benchmark/dataset/diffs/benign-e97a20eaa6.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-4439b82d3e",
+    "repo": "scrapy/scrapy",
+    "commit": "4439b82d3e784bc766e119cf18c7f49a9207540c",
+    "diff_path": "benchmark/dataset/diffs/benign-4439b82d3e.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-9mrh-v2v3-xpfm",
+    "repo": "apostrophecms/apostrophe",
+    "commit": "7ca2d16237c72718ef7e5c7ae0458e6027ac4f64",
+    "diff_path": "benchmark/dataset/diffs/GHSA-9mrh-v2v3-xpfm.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-40186",
+    "category": "sanitize-html allowedTags Bypass via Entity-Decoded Text in nonTextTags Elements",
+    "split": "test"
+  },
+  {
+    "id": "benign-10304827e4",
+    "repo": "pallets/jinja",
+    "commit": "10304827e46780c7a1bd08f2fa6b304dbe47d6b8",
+    "diff_path": "benchmark/dataset/diffs/benign-10304827e4.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-rjqq-98f6-6j3r",
+    "repo": "apostrophecms/sanitize-html",
+    "commit": "bdf7836ef8f0e5b21f9a1aab0623ae8fcd09c1da",
+    "diff_path": "benchmark/dataset/diffs/GHSA-rjqq-98f6-6j3r.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-26539",
+    "category": "Improper Input Validation in sanitize-html",
+    "split": "test"
+  },
+  {
+    "id": "benign-6f205ff422",
+    "repo": "requests/requests",
+    "commit": "6f205ff422bccd5e4c4fc0b64c5f3e7df5181db6",
+    "diff_path": "benchmark/dataset/diffs/benign-6f205ff422.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-3h5v-q93c-6h6q",
+    "repo": "websockets/ws",
+    "commit": "22c28763234aa75a7e1b76f5c01c181260d7917f",
+    "diff_path": "benchmark/dataset/diffs/GHSA-3h5v-q93c-6h6q.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-37890",
+    "category": "ws affected by a DoS when handling a request with many HTTP headers",
+    "split": "dev"
+  },
+  {
+    "id": "benign-b5da079228",
+    "repo": "socketio/socket.io",
+    "commit": "b5da079228666fcabd97166486d5f6a110826bc8",
+    "diff_path": "benchmark/dataset/diffs/benign-b5da079228.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-76g3-c3x4-crvx",
+    "repo": "scrapy/scrapy",
+    "commit": "9523e1ec8c41fde265a26d14563d178b6f1ad04b",
+    "diff_path": "benchmark/dataset/diffs/GHSA-76g3-c3x4-crvx.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-84366",
+    "category": "Scrapy: S3DownloadHandler sends signed S3 requests over plaintext HTTP by defaul",
+    "split": "dev"
+  },
+  {
+    "id": "benign-98d31a93a9",
+    "repo": "Automattic/mongoose",
+    "commit": "98d31a93a991a62b2e4f35f79759a9d75f9853ce",
+    "diff_path": "benchmark/dataset/diffs/benign-98d31a93a9.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-14bded25d1",
+    "repo": "twisted/twisted",
+    "commit": "14bded25d16f6a170a1f9e9314c0099d1ec4fad7",
+    "diff_path": "benchmark/dataset/diffs/benign-14bded25d1.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-82e73e5822",
+    "repo": "mde/ejs",
+    "commit": "82e73e58228af29ac29ed4b69cb121c609083fe4",
+    "diff_path": "benchmark/dataset/diffs/benign-82e73e5822.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-29d339c87f",
+    "repo": "pallets/quart",
+    "commit": "29d339c87f9efd1ba5268666e2404530fe078911",
+    "diff_path": "benchmark/dataset/diffs/benign-29d339c87f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-c8m8-j448-xjx7",
+    "repo": "twisted/twisted",
+    "commit": "046a164f89a0f08d3239ecebd750360f8914df33",
+    "diff_path": "benchmark/dataset/diffs/GHSA-c8m8-j448-xjx7.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-41671",
+    "category": "twisted.web has disordered HTTP pipeline response",
+    "split": "test"
+  },
+  {
+    "id": "benign-3950aff8bb",
+    "repo": "vercel/next.js",
+    "commit": "3950aff8bb9cbb61f748c20a6c13566e99457325",
+    "diff_path": "benchmark/dataset/diffs/benign-3950aff8bb.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-d73fa1cdcb",
+    "repo": "pallets/flask",
+    "commit": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+    "diff_path": "benchmark/dataset/diffs/benign-d73fa1cdcb.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-9hjg-9r4m-mvj7",
+    "repo": "psf/requests",
+    "commit": "96ba401c1296ab1dda74a2365ef36d88f7d144ef",
+    "diff_path": "benchmark/dataset/diffs/GHSA-9hjg-9r4m-mvj7.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-47081",
+    "category": "Requests vulnerable to .netrc credentials leak via malicious URLs",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-989c-m532-p2hv",
+    "repo": "saltstack/salt",
+    "commit": "e39116fb87bf4db9bcb9aade8258c66df87d41fe",
+    "diff_path": "benchmark/dataset/diffs/GHSA-989c-m532-p2hv.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-22242",
+    "category": "Salt's worker process vulnerable to denial of service through file read operatio",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-6j2x-vhqr-qr7q",
+    "repo": "patriksimek/vm2",
+    "commit": "6915fa4d9bcebd47b9a4f39a1adc1aa94ef6ffc6",
+    "diff_path": "benchmark/dataset/diffs/GHSA-6j2x-vhqr-qr7q.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-47210",
+    "category": "vm2 sandbox escape via JSPI-backed Promise `.finally()` species bypass",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-87hc-h4r5-73f7",
+    "repo": "pallets/werkzeug",
+    "commit": "7ae1d254e04a0c33e241ac1cca4783ce6c875ca3",
+    "diff_path": "benchmark/dataset/diffs/GHSA-87hc-h4r5-73f7.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-21860",
+    "category": " Werkzeug safe_join() allows Windows special device names with compound extensio",
+    "split": "test"
+  },
+  {
+    "id": "benign-5a94eb7796",
+    "repo": "maximebf/php-debugbar",
+    "commit": "5a94eb77963d2825b6d274cc75c1a2325dc39d95",
+    "diff_path": "benchmark/dataset/diffs/benign-5a94eb7796.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-142f593e40",
+    "repo": "paramiko/paramiko",
+    "commit": "142f593e40ad767c5e3556cbace66dc84589620c",
+    "diff_path": "benchmark/dataset/diffs/benign-142f593e40.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-r683-j2x4-v87g",
+    "repo": "node-fetch/node-fetch",
+    "commit": "1ef4b560a17e644a02a3bfdea7631ffeee578b35",
+    "diff_path": "benchmark/dataset/diffs/GHSA-r683-j2x4-v87g.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2022-0235",
+    "category": "node-fetch forwards secure headers to untrusted sites",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-vh95-rmgr-6w4m",
+    "repo": "minimistjs/minimist",
+    "commit": "10bd4cdf49d9686d48214be9d579a9cdfda37c68",
+    "diff_path": "benchmark/dataset/diffs/GHSA-vh95-rmgr-6w4m.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2020-7598",
+    "category": "Prototype Pollution in minimist",
+    "split": "test"
+  },
+  {
+    "id": "benign-7b5253883f",
+    "repo": "apostrophecms/apostrophe",
+    "commit": "7b5253883f39b6d511835064de983ed68b384966",
+    "diff_path": "benchmark/dataset/diffs/benign-7b5253883f.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-x6fg-f45m-jf5q",
+    "repo": "npm/node-semver",
+    "commit": "5c4c9f6e26c7052a42b5ced2a7481c5c9b4363a0",
+    "diff_path": "benchmark/dataset/diffs/GHSA-x6fg-f45m-jf5q.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2015-8855",
+    "category": "Regular Expression Denial of Service in semver",
+    "split": "test"
+  },
+  {
+    "id": "benign-ab34262bba",
+    "repo": "punkave/sanitize-html",
+    "commit": "ab34262bbae11c3b3976b7a7a292db4bfd2918eb",
+    "diff_path": "benchmark/dataset/diffs/benign-ab34262bba.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-1bd4dc3850",
+    "repo": "sequelize/sequelize",
+    "commit": "1bd4dc3850be367f2114ee3cbd5947a4c1c8e064",
+    "diff_path": "benchmark/dataset/diffs/benign-1bd4dc3850.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-8d98faa9a1",
+    "repo": "benoitc/gunicorn",
+    "commit": "8d98faa9a13d3399a7bea81b5169e5cd72225395",
+    "diff_path": "benchmark/dataset/diffs/benign-8d98faa9a1.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-x84v-xcm2-53pg",
+    "repo": "requests/requests",
+    "commit": "c45d7c49ea75133e52ab22a8e9e13173938e36ff",
+    "diff_path": "benchmark/dataset/diffs/GHSA-x84v-xcm2-53pg.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2018-18074",
+    "category": "Insufficiently Protected Credentials in Requests",
+    "split": "dev"
+  },
+  {
+    "id": "benign-6e487df951",
+    "repo": "patriksimek/vm2",
+    "commit": "6e487df9518e455e5e60faec3df3a0e2e27f9940",
+    "diff_path": "benchmark/dataset/diffs/benign-6e487df951.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "benign-fc465fa1e7",
+    "repo": "ansible/ansible-modules-core",
+    "commit": "fc465fa1e776a1e9d3a7448db0081d3e205ec06e",
+    "diff_path": "benchmark/dataset/diffs/benign-fc465fa1e7.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-34x7-hfp2-rc4v",
+    "repo": "isaacs/node-tar",
+    "commit": "f4a7aa9bc3d717c987fdf1480ff7a64e87ffdb46",
+    "diff_path": "benchmark/dataset/diffs/GHSA-34x7-hfp2-rc4v.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-24842",
+    "category": "node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Trave",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-c46w-gr7f-jm2p",
+    "repo": "saltstack/salt",
+    "commit": "41d834bf800d86fc496e4fac2d3875fc2aca7c62",
+    "diff_path": "benchmark/dataset/diffs/GHSA-c46w-gr7f-jm2p.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-22239",
+    "category": "Salt vulnerable to arbitrary event injection",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-4c39-4ccg-62r3",
+    "repo": "vercel/next.js",
+    "commit": "57c31f724d746e86a9e8b92aa8be538a922446a4",
+    "diff_path": "benchmark/dataset/diffs/GHSA-4c39-4ccg-62r3.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-64646",
+    "category": "Next.js: Unbounded Server Action payload in Edge runtime",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-5cvj-7rg6-jggj",
+    "repo": "B-Step62/mlflow",
+    "commit": "2e02bc7bb70df243e6eb792689d9b8eba0013161",
+    "diff_path": "benchmark/dataset/diffs/GHSA-5cvj-7rg6-jggj.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2025-11201",
+    "category": "MLflow Tracking Server Model Creation Directory Traversal Remote Code Execution ",
+    "split": "test"
+  },
+  {
+    "id": "benign-e02a4e9e01",
+    "repo": "isaacs/node-tar",
+    "commit": "e02a4e9e013c4be95302e2eb2047a942b883c27b",
+    "diff_path": "benchmark/dataset/diffs/benign-e02a4e9e01.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-409fec9077",
+    "repo": "mde/ejs",
+    "commit": "409fec90771fc6c22ace2a740e8edefeac118188",
+    "diff_path": "benchmark/dataset/diffs/benign-409fec9077.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "benign-fc373c9115",
+    "repo": "ljharb/qs",
+    "commit": "fc373c91152bff8719746e8287b7ee78ccb48d5d",
+    "diff_path": "benchmark/dataset/diffs/benign-fc373c9115.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-rh6x-qvg7-rrmj",
+    "repo": "ansible/ansible-modules-extras",
+    "commit": "7c3999a92a1cd856ff9bc8913a93ff1aee8bffc3",
+    "diff_path": "benchmark/dataset/diffs/GHSA-rh6x-qvg7-rrmj.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2016-3096",
+    "category": "Link Following in ansible",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-w3h3-4rj7-4ph4",
+    "repo": "benoitc/gunicorn",
+    "commit": "ac29c9b0a758d21f1e0fb3b3457239e523fa9f1d",
+    "diff_path": "benchmark/dataset/diffs/GHSA-w3h3-4rj7-4ph4.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2024-1135",
+    "category": "Request smuggling leading to endpoint restriction bypass in Gunicorn",
+    "split": "dev"
+  },
+  {
+    "id": "benign-e53751fb29",
+    "repo": "ansible/ansible",
+    "commit": "e53751fb29987c897a636eff5bcf796f30f7a125",
+    "diff_path": "benchmark/dataset/diffs/benign-e53751fb29.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "test"
+  },
+  {
+    "id": "GHSA-35jh-r3h4-6jhm",
+    "repo": "lodash/lodash",
+    "commit": "3469357cff396a26c363f8c1b5a91dde28ba4b1c",
+    "diff_path": "benchmark/dataset/diffs/GHSA-35jh-r3h4-6jhm.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-23337",
+    "category": "Command Injection in lodash",
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-r854-96gq-rfg3",
+    "repo": "python-imaging/Pillow",
+    "commit": "4e9f367dfd3f04c8f5d23f7f759ec12782e10ee7",
+    "diff_path": "benchmark/dataset/diffs/GHSA-r854-96gq-rfg3.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2014-1933",
+    "category": "Pillow Temporary file name leakage",
+    "split": "test"
+  },
+  {
+    "id": "benign-e218216a98",
+    "repo": "sqlalchemy/sqlalchemy",
+    "commit": "e218216a9854c3f84c3fb59d89f94f1f77861fe1",
+    "diff_path": "benchmark/dataset/diffs/benign-e218216a98.diff",
+    "is_vulnerable": false,
+    "cve_id": null,
+    "category": null,
+    "split": "dev"
+  },
+  {
+    "id": "GHSA-wv5p-gmmv-wh9v",
+    "repo": "ansible-collections/community.general",
+    "commit": "1d0c5e2ba47724c31a18d7b08b9daf13df8829dc",
+    "diff_path": "benchmark/dataset/diffs/GHSA-wv5p-gmmv-wh9v.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2021-20178",
+    "category": "Insertion of Sensitive Information into Log File in ansible",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-2598-2f59-rmhq",
+    "repo": "sequelize/sequelize",
+    "commit": "ee4017379db0059566ecb5424274ad4e2d66bc68",
+    "diff_path": "benchmark/dataset/diffs/GHSA-2598-2f59-rmhq.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2019-10749",
+    "category": "SQL Injection in sequelize",
+    "split": "test"
+  },
+  {
+    "id": "GHSA-38jv-5279-wg99",
+    "repo": "urllib3/urllib3",
+    "commit": "8864ac407bba8607950025e0979c4c69bc7abc7b",
+    "diff_path": "benchmark/dataset/diffs/GHSA-38jv-5279-wg99.diff",
+    "is_vulnerable": true,
+    "cve_id": "CVE-2026-21441",
+    "category": "Decompression-bomb safeguards bypassed when following HTTP redirects (streaming ",
+    "split": "test"
   }
 ]

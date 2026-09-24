@@ -5,6 +5,7 @@ import pytest
 from benchmark.build_dataset import (
     ManifestEntry,
     filter_to_source,
+    redact_advisory_ids,
     fix_commits_from_references,
     is_reviewable_diff,
     reverse_diff,
@@ -272,3 +273,22 @@ def test_rejects_a_split_that_is_unbalanced_even_if_the_whole_is():
     ]
     with pytest.raises(ValueError, match="split"):
         validate_manifest(entries)
+
+
+# --- advisory identifiers: a reversed fix can "delete" a comment naming its own CVE ---
+
+
+def test_redacts_cve_and_ghsa_identifiers():
+    diff = "-        # CVE-2022-24302.\n- * protection (GHSA-6j2x-vhqr-qr7q)\n"
+    redacted = redact_advisory_ids(diff)
+    assert "CVE-2022" not in redacted and "GHSA-6j2x" not in redacted
+
+
+def test_redaction_keeps_line_count_so_hunks_stay_valid():
+    diff = "@@ -1,2 +1,1 @@\n-# CVE-2022-24302\n+x = 1\n"
+    assert len(redact_advisory_ids(diff).splitlines()) == len(diff.splitlines())
+
+
+def test_ordinary_code_is_untouched():
+    diff = "+const vulnerableTags = ['script', 'style'];\n"
+    assert redact_advisory_ids(diff) == diff

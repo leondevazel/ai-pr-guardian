@@ -94,6 +94,19 @@ def fix_commits_from_references(vuln: dict) -> list[dict]:
     return found
 
 
+ADVISORY_ID = re.compile(r"\bCVE-\d{4}-\d{4,}\b|\bGHSA(?:-[0-9a-z]{4}){3}\b", re.IGNORECASE)
+
+
+def redact_advisory_ids(diff_text: str) -> str:
+    """Replace CVE/GHSA identifiers with a neutral word.
+
+    Fix commits often add a comment naming their own advisory; reversed, the "PR" deletes that
+    comment and hands the reviewer the label. Substituting within the line keeps line counts, so
+    hunk headers stay valid. Prose like "known to induce vulnerabilities" is left alone: a real
+    author could delete such a comment, and that is a fair signal for a reviewer to use."""
+    return ADVISORY_ID.sub("an advisory", diff_text)
+
+
 def split_for(example_id: str) -> str:
     """Stable half/half split by id hash. Tuning happens on dev only; the reported number comes
     from test, which no prompt change was ever checked against."""
@@ -350,7 +363,7 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
         fix_shas.add(fix["commit"])
         repos_seen.append(fix["repo"])
         name = f"{fix['id']}.diff"
-        (diffs_dir / name).write_text(reverse_diff(diff), encoding="utf-8")
+        (diffs_dir / name).write_text(redact_advisory_ids(reverse_diff(diff)), encoding="utf-8")
         positives.append(
             ManifestEntry(
                 id=fix["id"],
@@ -385,7 +398,7 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
                 continue
 
             name = f"benign-{sha[:10]}.diff"
-            (diffs_dir / name).write_text(diff, encoding="utf-8")
+            (diffs_dir / name).write_text(redact_advisory_ids(diff), encoding="utf-8")
             negatives.append(
                 ManifestEntry(
                     id=f"benign-{sha[:10]}",

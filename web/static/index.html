@@ -142,6 +142,33 @@
   .error { padding: 14px 16px; border-left: 3px solid var(--red); background: var(--red-wash); }
   .error[hidden] { display: none; }
 
+  /* ---------- how it works ---------- */
+  .explain {
+    max-width: 1280px; margin: 0 auto; padding: 8px 24px 48px;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px;
+    border-top: 1px solid var(--rule);
+  }
+  @media (max-width: 900px) { .explain { grid-template-columns: 1fr; } }
+  .explain > h2 { grid-column: 1 / -1; margin: 32px 0 0; font-size: 26px; font-weight: 900; letter-spacing: -0.01em; }
+  .explain .lede { grid-column: 1 / -1; margin: 0; max-width: 72ch; font-size: 18px; color: var(--ink-soft); }
+  .explain section h3 { margin: 24px 0 8px; font-size: 17px; }
+  .explain p, .explain li { max-width: 68ch; color: var(--ink); }
+  .explain p { margin: 0 0 10px; }
+  .explain ol { margin: 0; padding-left: 1.3em; }
+  .explain ol li { margin: 0 0 10px; }
+  .explain ol li::marker { font-weight: 700; }
+  .explain strong { font-weight: 700; }
+  .explain a { font-weight: 500; }
+  .figures { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin: 6px 0 12px; align-items: baseline; }
+  .figures dt { font-weight: 900; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .figures dd { margin: 0; color: var(--ink-soft); }
+  .legend { list-style: none; padding: 0; margin: 0 0 10px; }
+  .legend li { display: grid; grid-template-columns: 14px 1fr; gap: 10px; align-items: start; margin: 0 0 8px; }
+  .swatch { width: 3px; height: 1.3em; border-radius: 2px; margin-left: 5px; margin-top: 2px; }
+  .swatch.red { background: var(--red); }
+  .swatch.ochre { background: var(--ochre); }
+  .explain s { color: #98A0AE; }
+
   footer {
     max-width: 1280px; margin: 0 auto; padding: 0 24px 40px; color: var(--ink-soft); font-size: 14px;
   }
@@ -222,9 +249,43 @@
   </section>
 </main>
 
+<article class="explain" aria-labelledby="explain-title">
+  <h2 id="explain-title" data-i18n="exTitle"></h2>
+  <p class="lede" data-i18n="exLede"></p>
+
+  <section>
+    <h3 data-i18n="exStepsTitle"></h3>
+    <ol data-i18n-html="exSteps"></ol>
+
+    <h3 data-i18n="exReadTitle"></h3>
+    <ul class="legend">
+      <li><span class="swatch red"></span><span data-i18n-html="exReadRed"></span></li>
+      <li><span class="swatch ochre"></span><span data-i18n-html="exReadOchre"></span></li>
+      <li><span></span><span data-i18n-html="exReadConf"></span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h3 data-i18n="exWhyTitle"></h3>
+    <p data-i18n-html="exWhy1"></p>
+    <p data-i18n-html="exWhy2"></p>
+
+    <h3 data-i18n="exMeasureTitle"></h3>
+    <p data-i18n-html="exMeasure1"></p>
+    <dl class="figures">
+      <dt>0.65</dt><dd data-i18n="exFigPipeline"></dd>
+      <dt>0.16</dt><dd data-i18n="exFigSemgrep"></dd>
+      <dt>6 / 6</dt><dd data-i18n="exFigSecurity"></dd>
+    </dl>
+    <p data-i18n-html="exMeasure2"></p>
+
+    <h3 data-i18n="exDataTitle"></h3>
+    <p data-i18n="exData"></p>
+  </section>
+</article>
+
 <footer>
-  <p data-i18n-html="footer1"></p>
-  <p data-i18n="footer2"></p>
+  <p data-i18n-html="footer"></p>
 </footer>
 
 <script>
@@ -308,8 +369,28 @@ const STRINGS = {
     needLink: "Paste a pull request link first.",
     couldNotStart: "The review could not start (HTTP {status}).",
     lostConnection: "Lost the connection to the server. Try again.",
-    footer1: 'On a benchmark built from real CVE fix commits, the security reviewer\'s blocking findings were right every time (6 of 6) but it caught about a third of the vulnerabilities. The other two reviewers catch far more and are wrong far more, which is why they only advise. Full numbers and limits are in <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">RESULTS.md</a>.',
-    footer2: "Your votes on findings are stored with the review so the next benchmark can use them. Diffs you submit are sent to Anthropic's API for review.",
+    exTitle: "How it works",
+    exLede: "PR Guardian reviews a code change the way a small review board would: three specialists read it independently, challenge each other, and a chief reviewer decides what is worth a human's attention. It is built for one job that matters more as AI writes more code — catching the change that quietly lets an attacker in, without burying the author in noise.",
+    exStepsTitle: "What happens when you press Review",
+    exSteps: `<li><strong>Independent review.</strong> Three reviewers read the diff at the same time, each with a narrow brief: security looks for injection, broken authentication, leaked secrets and path tricks; architecture looks for breaking changes and swallowed errors; business logic looks for boundary mistakes and missing cases. Every finding has to name a file, a line, and quote the code — anything vaguer is thrown away before anyone sees it.</li>
+<li><strong>Rebuttal.</strong> Each reviewer is shown what the others found on the same lines and may raise or lower its own confidence. It cannot add new findings in this round, which keeps it quick and cheap.</li>
+<li><strong>Chief's verdict.</strong> A stronger model reads everything that survived and keeps only what a person should look at, dropping duplicates and speculation. It can choose among findings but cannot invent one. The decision to block is then made by a fixed rule in code, not by the model.</li>`,
+    exReadTitle: "Reading the result",
+    exReadRed: "<strong>Red mark in the margin:</strong> the security reviewer flagged this line. These are the only findings that can block a merge.",
+    exReadOchre: "<strong>Ochre mark:</strong> an advisory finding from the architecture or business-logic reviewer. Worth reading, never blocking.",
+    exReadConf: "<strong>Confidence</strong> is each reviewer's own estimate, from 0 to 1. A struck-through value, like <s>0.90</s> 0.95, means it changed after the rebuttal.",
+    exWhyTitle: "Why only security findings can block",
+    exWhy1: "When all three reviewers could block a merge, the tool caught almost every vulnerability — and also flagged two out of three perfectly harmless changes. A reviewer that cries wolf that often gets switched off.",
+    exWhy2: "Split by reviewer, the picture was clear. <strong>The security reviewer was right every time it spoke</strong> and never flagged a harmless change. The other two found more real problems between them, but produced every single false alarm. So they advise, and security decides.",
+    exMeasureTitle: "How well it works",
+    exMeasure1: "It was tested on real security fixes from projects like Django, Flask, Pillow, aiohttp and requests. Each fix was applied in reverse, which turns it into a change that <em>introduces</em> the original vulnerability. An equal number of ordinary, harmless changes from the same projects were mixed in. The baseline is Semgrep, a widely used static analyzer, given the complete file rather than just the diff.",
+    exFigPipeline: "F1 score for the review board (average of three runs)",
+    exFigSemgrep: "F1 score for Semgrep on the same changes",
+    exFigSecurity: "security findings that were real vulnerabilities, with zero false alarms",
+    exMeasure2: "The honest caveats: the test set has 38 changes, so small differences mean little, and results vary between runs because the model is not deterministic. The security reviewer is precise but catches only about a third of vulnerabilities on its own. A larger 198-change benchmark in Python and JavaScript is built but not yet scored. Details, including the measurement bugs found along the way, are in <a href='https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md'>RESULTS.md</a>.",
+    exDataTitle: "What happens to your code",
+    exData: "The diff you submit is sent to Anthropic's API to be reviewed and is kept on this server with the result. Your votes on findings are stored with it, as labels for the next benchmark. Don't paste code you're not allowed to share.",
+    footer: 'PR Guardian is a portfolio project. Source code, benchmark and write-up are on <a href="https://github.com/leondevazel/ai-pr-guardian">GitHub</a>.',
   },
   ko: {
     pageTitle: "PR Guardian",
@@ -361,8 +442,28 @@ const STRINGS = {
     needLink: "먼저 PR 링크를 붙여넣어 주세요.",
     couldNotStart: "리뷰를 시작하지 못했습니다 (HTTP {status}).",
     lostConnection: "서버와 연결이 끊어졌습니다. 다시 시도해 주세요.",
-    footer1: '실제 CVE 수정 커밋으로 만든 벤치마크에서, 보안 검토자가 차단한 지적은 모두 맞았지만(6건 중 6건) 전체 취약점의 약 3분의 1만 잡아냈습니다. 나머지 두 검토자는 훨씬 많이 잡지만 틀리는 경우도 훨씬 많아서, 참고 의견만 냅니다. 전체 수치와 한계는 <a href="https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md">RESULTS.md</a>에 있습니다.',
-    footer2: "지적에 대한 투표는 리뷰와 함께 저장되어 다음 벤치마크에 쓰입니다. 제출한 diff는 리뷰를 위해 Anthropic API로 전송됩니다.",
+    exTitle: "작동 방식",
+    exLede: "PR Guardian은 작은 코드 리뷰 위원회처럼 변경 사항을 검토합니다. 전문 검토자 세 명이 각자 읽고, 서로의 의견에 반박한 뒤, 수석 검토자가 사람이 실제로 봐야 할 것만 추려냅니다. AI가 쓰는 코드가 늘어날수록 중요해지는 한 가지 일, 곧 공격자에게 조용히 문을 열어주는 변경을 잡아내되 작성자를 쓸데없는 지적에 파묻지 않는 일을 위해 만들었습니다.",
+    exStepsTitle: "리뷰하기를 누르면 일어나는 일",
+    exSteps: `<li><strong>개별 검토.</strong> 검토자 세 명이 동시에 diff를 읽습니다. 각자 맡은 범위가 좁게 정해져 있습니다. 보안은 인젝션, 인증 우회, 비밀정보 노출, 경로 조작을, 아키텍처는 호환성을 깨는 변경과 삼켜진 오류를, 비즈니스 로직은 경계값 실수와 빠진 경우를 봅니다. 모든 지적은 파일과 줄 번호를 짚고 해당 코드를 인용해야 하며, 그보다 모호한 지적은 누구에게도 보이기 전에 버려집니다.</li>
+<li><strong>반박.</strong> 각 검토자는 다른 검토자들이 같은 줄에서 무엇을 찾았는지 보고, 자기 지적의 확신도를 올리거나 내릴 수 있습니다. 이 단계에서는 새 지적을 추가할 수 없어서 빠르고 저렴하게 끝납니다.</li>
+<li><strong>최종 판정.</strong> 더 강한 모델이 남은 지적을 모두 읽고, 중복과 추측을 걸러 사람이 볼 만한 것만 남깁니다. 지적 중에서 고를 수만 있고 새로 만들어낼 수는 없습니다. 머지를 막을지는 모델이 아니라 코드에 고정된 규칙이 결정합니다.</li>`,
+    exReadTitle: "결과 읽는 법",
+    exReadRed: "<strong>여백의 빨간 표시:</strong> 보안 검토자가 이 줄을 짚었습니다. 머지를 막을 수 있는 건 이 지적들뿐입니다.",
+    exReadOchre: "<strong>황토색 표시:</strong> 아키텍처나 비즈니스 로직 검토자의 참고 의견입니다. 읽어볼 만하지만 머지를 막지는 않습니다.",
+    exReadConf: "<strong>확신도</strong>는 각 검토자가 스스로 매긴 0~1 사이의 값입니다. <s>0.90</s> 0.95처럼 취소선이 그어져 있으면 반박 단계에서 값이 바뀌었다는 뜻입니다.",
+    exWhyTitle: "왜 보안 지적만 머지를 막을 수 있나",
+    exWhy1: "처음에는 세 검토자 모두 머지를 막을 수 있게 했습니다. 그랬더니 취약점은 거의 다 잡았지만, 아무 문제 없는 변경도 셋 중 둘을 막아버렸습니다. 이렇게 자주 헛경보를 울리는 도구는 결국 꺼지게 됩니다.",
+    exWhy2: "검토자별로 나눠 보니 답이 분명했습니다. <strong>보안 검토자는 지적할 때마다 맞았고</strong>, 문제없는 변경을 막은 적이 한 번도 없었습니다. 나머지 두 검토자는 실제 문제를 더 많이 찾았지만 헛경보도 전부 이 둘에게서 나왔습니다. 그래서 둘은 조언만 하고, 결정은 보안 검토자가 합니다.",
+    exMeasureTitle: "성능은 어느 정도인가",
+    exMeasure1: "Django, Flask, Pillow, aiohttp, requests 같은 프로젝트의 실제 보안 수정 커밋으로 시험했습니다. 각 수정을 거꾸로 적용하면 원래의 취약점을 <em>들여오는</em> 변경이 됩니다. 여기에 같은 프로젝트의 평범하고 무해한 변경을 같은 수만큼 섞었습니다. 비교 대상은 널리 쓰이는 정적 분석 도구 Semgrep이며, Semgrep에는 diff가 아니라 파일 전체를 주었습니다.",
+    exFigPipeline: "검토 위원회의 F1 점수 (3회 실행 평균)",
+    exFigSemgrep: "같은 변경에 대한 Semgrep의 F1 점수",
+    exFigSecurity: "보안 지적 중 실제 취약점이었던 비율 (헛경보 0건)",
+    exMeasure2: "솔직한 한계도 있습니다. 시험한 변경이 38개뿐이라 작은 차이는 의미가 없고, 모델이 매번 같은 답을 내지 않아서 실행할 때마다 결과가 조금씩 다릅니다. 보안 검토자는 정확하지만 혼자서는 취약점의 약 3분의 1만 잡아냅니다. Python과 JavaScript 변경 198개로 만든 더 큰 벤치마크는 준비됐지만 아직 채점하지 않았습니다. 측정 과정에서 발견한 버그까지 포함한 자세한 내용은 <a href='https://github.com/leondevazel/ai-pr-guardian/blob/main/RESULTS.md'>RESULTS.md</a>에 있습니다.",
+    exDataTitle: "제출한 코드는 어떻게 되나",
+    exData: "제출한 diff는 리뷰를 위해 Anthropic API로 전송되고, 결과와 함께 이 서버에 보관됩니다. 지적에 대한 투표도 함께 저장되어 다음 벤치마크의 정답 자료로 쓰입니다. 공유해서는 안 되는 코드는 붙여넣지 마세요.",
+    footer: 'PR Guardian은 포트폴리오 프로젝트입니다. 소스 코드, 벤치마크, 상세 기록은 <a href="https://github.com/leondevazel/ai-pr-guardian">GitHub</a>에 있습니다.',
   },
 };
 

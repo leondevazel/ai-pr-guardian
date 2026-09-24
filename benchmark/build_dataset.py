@@ -8,6 +8,7 @@ Network access is confined to fetch_* functions; everything the tests care about
 """
 
 import argparse
+import hashlib
 import json
 import os
 import random
@@ -35,6 +36,7 @@ class ManifestEntry:
     is_vulnerable: bool | None
     cve_id: str | None
     category: str | None
+    split: str = ""
 
 
 def reverse_diff(diff_text: str) -> str:
@@ -65,6 +67,38 @@ def reverse_diff(diff_text: str) -> str:
         else:
             out.append(line)
     return "".join(out)
+
+
+COMMIT_URL = re.compile(r"^https://github\.com/([^/]+/[^/]+)/commit/([0-9a-fA-F]{7,40})")
+
+
+def fix_commits_from_references(vuln: dict) -> list[dict]:
+    """Patch commits linked from an advisory's references.
+
+    npm advisories in OSV carry no GIT ranges at all; their fixes live only as commit URLs among
+    the references. These also tend to be the actual patch, where a GIT range's "fixed" event is
+    often a release commit that only bumps a version string."""
+    cve_id = next((a for a in vuln.get("aliases", []) if a.startswith("CVE-")), None)
+    found = []
+    for ref in vuln.get("references", []):
+        if match := COMMIT_URL.match(ref.get("url", "")):
+            found.append(
+                {
+                    "id": vuln.get("id"),
+                    "cve_id": cve_id,
+                    "repo": match.group(1),
+                    "commit": match.group(2),
+                    "category": (vuln.get("summary") or "")[:80],
+                }
+            )
+    return found
+
+
+def split_for(example_id: str) -> str:
+    """Stable half/half split by id hash. Tuning happens on dev only; the reported number comes
+    from test, which no prompt change was ever checked against."""
+    digest = hashlib.sha256(example_id.encode()).digest()
+    return "test" if digest[0] % 2 else "dev"
 
 
 def select_candidates(candidates: list[dict]) -> list[dict]:
@@ -168,6 +202,14 @@ def validate_manifest(entries: list[ManifestEntry], minimum: int = 0) -> None:
             "Unbalanced classes make the false-positive rate unreadable."
         )
 
+    for split in {e.split for e in entries if e.split}:
+        in_split = [e for e in entries if e.split == split]
+        pos = sum(1 for e in in_split if e.is_vulnerable)
+        if pos != len(in_split) - pos:
+            raise ValueError(
+                f"{split} split balance is off: {pos} vulnerable vs {len(in_split) - pos} benign"
+            )
+
 
 def write_manifest(entries: list[ManifestEntry], path: Path, minimum: int = 0) -> None:
     validate_manifest(entries, minimum=minimum)
@@ -226,6 +268,7 @@ def fetch_fix_commits(ecosystem: str, package: str) -> list[dict]:
 
     found = []
     for vuln in vulns:
+        found.extend(fix_commits_from_references(vuln))
         for affected in vuln.get("affected", []):
             for rng in affected.get("ranges", []):
                 if rng.get("type") != "GIT":
@@ -317,6 +360,7 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
                 is_vulnerable=True,
                 cve_id=fix["cve_id"],
                 category=fix["category"],
+                split=split_for(fix["id"]),
             )
         )
         print(f"  + positive {fix['id']} ({fix['repo']})")
@@ -351,6 +395,8 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
                     is_vulnerable=False,
                     cve_id=None,
                     category=None,
+                    # Inherit the paired positive's half so dev and test each stay balanced.
+                    split=positives[len(negatives)].split,
                 )
             )
             print(f"  - negative {sha[:10]} ({repo})")
@@ -362,14 +408,19 @@ def build(packages: list[tuple[str, str]], target_per_class: int, out_dir: Path)
 
 
 DEFAULT_PACKAGES = [
-    ("PyPI", "django"),
-    ("PyPI", "flask"),
-    ("PyPI", "requests"),
-    ("PyPI", "pillow"),
-    ("PyPI", "aiohttp"),
-    ("npm", "express"),
-    ("npm", "axios"),
-    ("npm", "lodash"),
+    ("PyPI", p)
+    for p in (
+        "django", "flask", "requests", "pillow", "aiohttp", "jinja2", "werkzeug", "urllib3",
+        "tornado", "twisted", "pyyaml", "sqlalchemy", "cryptography", "paramiko", "scrapy",
+        "gunicorn", "starlette", "fastapi", "mlflow", "ansible", "salt", "bleach", "lxml",
+    )
+] + [
+    ("npm", p)
+    for p in (
+        "express", "axios", "lodash", "jsonwebtoken", "minimist", "node-fetch", "ws", "next",
+        "undici", "tar", "handlebars", "ejs", "marked", "sanitize-html", "xml2js", "moment",
+        "semver", "qs", "follow-redirects", "socket.io", "mongoose", "sequelize", "vm2",
+    )
 ]
 
 

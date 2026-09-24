@@ -1,4 +1,4 @@
-from benchmark.evaluate import all_findings_decision, noise_ratio, score
+from benchmark.evaluate import all_findings_decision, f1_confidence_interval, noise_ratio, score
 from guardian.models import Finding, Verdict
 
 
@@ -90,3 +90,28 @@ def test_noise_ratio_is_zero_when_benign_prs_are_clean():
 
 def test_noise_ratio_without_benign_examples_is_zero():
     assert noise_ratio([verdict("block", 4)], [True]) == 0.0
+
+
+# --- bootstrap CI: a 38- or 200-example F1 needs an interval, not just a point ---
+
+
+def test_ci_brackets_the_point_estimate():
+    low, high = f1_confidence_interval(PREDICTIONS, LABELS, seed=0)
+    point = score(PREDICTIONS, LABELS).f1
+    assert low <= point <= high
+
+
+def test_ci_is_reproducible_with_a_seed():
+    assert f1_confidence_interval(PREDICTIONS, LABELS, seed=1) == f1_confidence_interval(
+        PREDICTIONS, LABELS, seed=1
+    )
+
+
+def test_perfect_predictions_have_a_degenerate_interval():
+    preds, labels = ["block", "approve"] * 10, [True, False] * 10
+    assert f1_confidence_interval(preds, labels, seed=0) == (1.0, 1.0)
+
+
+def test_small_samples_give_wide_intervals():
+    low, high = f1_confidence_interval(PREDICTIONS, LABELS, seed=0)
+    assert high - low > 0.2

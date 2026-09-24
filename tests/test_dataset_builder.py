@@ -5,9 +5,11 @@ import pytest
 from benchmark.build_dataset import (
     ManifestEntry,
     filter_to_source,
+    fix_commits_from_references,
     is_reviewable_diff,
     reverse_diff,
     select_candidates,
+    split_for,
     validate_manifest,
     write_manifest,
 )
@@ -141,6 +143,53 @@ def test_empty_filtered_diff_is_not_reviewable():
     assert not is_reviewable_diff("")
 
 
+# --- fix commits from advisory references (how npm advisories record them) ---
+
+
+def test_extracts_commit_from_reference_url():
+    vuln = {
+        "id": "GHSA-xxxx",
+        "aliases": ["CVE-2024-9"],
+        "summary": "Prototype pollution",
+        "references": [
+            {"type": "WEB", "url": "https://github.com/lodash/lodash/commit/abc123def456"},
+            {"type": "ADVISORY", "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-9"},
+        ],
+    }
+    fixes = fix_commits_from_references(vuln)
+    assert fixes == [
+        {
+            "id": "GHSA-xxxx",
+            "cve_id": "CVE-2024-9",
+            "repo": "lodash/lodash",
+            "commit": "abc123def456",
+            "category": "Prototype pollution",
+        }
+    ]
+
+
+def test_ignores_non_commit_references():
+    vuln = {"id": "GHSA-y", "references": [{"type": "WEB", "url": "https://github.com/a/b/pull/7"}]}
+    assert fix_commits_from_references(vuln) == []
+
+
+def test_strips_url_fragments_from_commit_sha():
+    vuln = {"id": "G", "references": [{"url": "https://github.com/a/b/commit/deadbeef#diff-1"}]}
+    assert fix_commits_from_references(vuln)[0]["commit"] == "deadbeef"
+
+
+# --- dev/test split: tune on one half, report on the other ---
+
+
+def test_split_is_deterministic():
+    assert split_for("PYSEC-2023-62") == split_for("PYSEC-2023-62")
+
+
+def test_split_is_roughly_even():
+    splits = [split_for(f"ID-{i}") for i in range(400)]
+    assert 160 < splits.count("test") < 240
+
+
 # --- candidate selection: one advisory can list several fix commits ---
 
 
@@ -212,3 +261,14 @@ def test_write_manifest_round_trips(tmp_path):
 
     loaded = json.loads(path.read_text(encoding="utf-8"))
     assert [e["is_vulnerable"] for e in loaded] == [True, False]
+
+
+def test_rejects_a_split_that_is_unbalanced_even_if_the_whole_is():
+    entries = [
+        entry(id="v1", split="dev"),
+        entry(id="v2", split="dev"),
+        entry(id="b1", is_vulnerable=False, split="test"),
+        entry(id="b2", is_vulnerable=False, split="test"),
+    ]
+    with pytest.raises(ValueError, match="split"):
+        validate_manifest(entries)

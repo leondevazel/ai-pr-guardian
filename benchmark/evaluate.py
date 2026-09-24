@@ -6,6 +6,7 @@ Raw counts are reported alongside percentages: with a 50-example set, "80% preci
 
 import argparse
 import json
+import random
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
@@ -43,6 +44,22 @@ def score(predictions: list[str], labels: list[bool]) -> Metrics:
     return Metrics(precision, recall, f1, tp, fp, tn, fn)
 
 
+def f1_confidence_interval(
+    predictions: list[str], labels: list[bool], n_resamples: int = 2000, seed: int = 0
+) -> tuple[float, float]:
+    """95% percentile-bootstrap interval for F1.
+
+    Resamples examples with replacement. At this sample size the interval, not the point, is the
+    honest thing to report: two configurations whose intervals overlap heavily have not been shown
+    to differ."""
+    rng = random.Random(seed)
+    pairs = list(zip(predictions, labels))
+    f1s = sorted(
+        score(*zip(*[rng.choice(pairs) for _ in pairs])).f1 for _ in range(n_resamples)
+    )
+    return round(f1s[int(0.025 * n_resamples)], 3), round(f1s[int(0.975 * n_resamples) - 1], 3)
+
+
 def all_findings_decision(verdict: Verdict) -> str:
     """What the verdict would be if advisory findings could gate a merge too.
 
@@ -72,8 +89,11 @@ def _post_change_ref(entry: dict) -> str:
     return parents[0]["sha"] if parents else entry["commit"]
 
 
-def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
-    entries = json.loads(manifest_path.read_text(encoding="utf-8"))[:limit]
+def run(manifest_path: Path, limit: int | None, out_dir: Path, split: str = "all") -> dict:
+    entries = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if split != "all":
+        entries = [e for e in entries if e.get("split") == split]
+    entries = entries[:limit]
     cache_dir = manifest_path.parent / "files"
     client = AnthropicClient()
 
@@ -116,9 +136,15 @@ def run(manifest_path: Path, limit: int | None, out_dir: Path) -> dict:
     results = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "n_examples": len(entries),
+        "split": split,
         "pipeline": asdict(score(pipeline_predictions, labels)),
         "pipeline_security_only": asdict(score(security_predictions, labels)),
         "baseline": asdict(score(baseline_predictions, labels)),
+        "f1_ci95": {
+            "pipeline": f1_confidence_interval(pipeline_predictions, labels),
+            "pipeline_security_only": f1_confidence_interval(security_predictions, labels),
+            "baseline": f1_confidence_interval(baseline_predictions, labels),
+        },
         "pipeline_noise_ratio": round(noise_ratio(pipeline_verdicts, labels), 3),
         "baseline_noise_ratio": round(
             sum(benign_baseline_counts) / len(benign_baseline_counts), 3
@@ -185,9 +211,17 @@ def main() -> None:
     parser.add_argument(
         "--repeats", type=int, default=1, help="run the benchmark N times to measure variance"
     )
+    parser.add_argument(
+        "--split",
+        choices=("dev", "test", "all"),
+        default="dev",
+        help="tune on dev; touch test only to report a final number",
+    )
     args = parser.parse_args()
 
-    runs = [run(Path(args.manifest), args.limit, Path(args.out)) for _ in range(args.repeats)]
+    runs = [
+        run(Path(args.manifest), args.limit, Path(args.out), args.split) for _ in range(args.repeats)
+    ]
     summarize_repeats(runs)
 
 

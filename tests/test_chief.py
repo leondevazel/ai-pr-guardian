@@ -84,3 +84,9 @@ def test_unknown_keys_cannot_add_findings():
 def test_two_findings_from_one_agent_on_one_line_stay_distinct():
     findings = [f("security", 9, "sqli"), f("security", 9, "logging")]
     assert finding_key(findings[0], findings) != finding_key(findings[1], findings)
+
+
+def test_keys_echoed_into_prose_become_plain_locations():
+    # Live Korean run after the key change: "security@app/db.py:12만 남겼습니다".
+    text = "security@app/db.py:12만 남겼습니다. architecture@a/b.py:3#2 제외."
+    assert scrub_indices(text) == "app/db.py:12만 남겼습니다. a/b.py:3 제외."

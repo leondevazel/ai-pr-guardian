@@ -72,6 +72,7 @@ PAREN_INDEX = re.compile(
     r"\s*\((?:findings?|indices|index|items?|#)\s*\d+(?:\s*(?:,|and|&)\s*\d+)*\)", re.IGNORECASE
 )
 BARE_INDEX = re.compile(r"\b[Ff]indings?\s+\d+(?:\s*(?:,|and|&)\s*\d+)*\b")
+ECHOED_KEY = re.compile(r"\b(?:security|architecture|business_logic)@([\w./-]+:\d+)(?:#\d+)?")
 
 
 def scrub_indices(rationale: str) -> str:
@@ -79,7 +80,8 @@ def scrub_indices(rationale: str) -> str:
 
     The author reading the PR comment never sees the numbered list, so an index is noise. Asking
     nicely reduced these; it did not stop them, so the rule is enforced here instead."""
-    text = PAREN_INDEX.sub("", rationale)
+    text = ECHOED_KEY.sub(r"\1", rationale)  # a key is a location with a prefix; keep the location
+    text = PAREN_INDEX.sub("", text)
     text = BARE_INDEX.sub("one finding", text)
     text = re.sub(r"(^|[.!?]\s+)one finding", lambda m: m.group(1) + "One finding", text)
     return re.sub(r"\s{2,}", " ", text).strip()

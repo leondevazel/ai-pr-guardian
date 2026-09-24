@@ -6,6 +6,7 @@ project has.
 """
 
 import json
+import logging
 import queue
 import re
 import threading
@@ -28,6 +29,7 @@ PAUSED_MESSAGE = (
 )
 PR_URL = re.compile(r"^https://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)/?$")
 STATIC = Path(__file__).parent / "static"
+log = logging.getLogger("pr_guardian.web")
 
 
 def validate_diff(diff_text: str) -> str | None:
@@ -161,12 +163,18 @@ def create_app(review_fn=default_review, fetch_pr=default_fetch_pr, data_dir=Non
                 events.put({"type": "verdict", "review_id": review_id, **asdict(verdict),
                             "cost_usd": round(cost, 4)})
             except Exception as error:  # surfaced to the page instead of hanging the stream
-                if "credit balance" in str(error).lower():
+                # Full detail goes to the server log only; the page gets a category, never the
+                # exception text, which can carry request ids or configuration hints.
+                log.exception("review failed")
+                text = str(error).lower()
+                if "credit balance" in text:
                     state["paused"] = True
-                    message = PAUSED_MESSAGE
+                    code, message = "credits", PAUSED_MESSAGE
+                elif "authentication" in text or "api-key" in text or "api_key" in text:
+                    code, message = "auth", "The demo is misconfigured. The owner has been notified in the logs."
                 else:
-                    message = "The review could not finish. Try again in a minute."
-                events.put({"type": "error", "message": message})
+                    code, message = "other", "The review could not finish. Try again in a minute."
+                events.put({"type": "error", "code": code, "message": message})
             finally:
                 events.put(None)
 

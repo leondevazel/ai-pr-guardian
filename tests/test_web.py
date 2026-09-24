@@ -168,3 +168,20 @@ def test_after_credits_run_out_later_visitors_are_told_before_waiting(broke_clie
 def test_default_daily_budget_protects_a_five_dollar_balance():
     from web.app import DEFAULT_DAILY_BUDGET_USD
     assert DEFAULT_DAILY_BUDGET_USD <= 0.5
+
+
+def bad_key(diff_text, on_event):
+    raise RuntimeError("Error code: 401 - authentication_error: invalid x-api-key")
+
+
+def test_a_bad_api_key_is_reported_as_a_category_without_details(tmp_path):
+    app = create_app(review_fn=bad_key, data_dir=tmp_path, guard=UsageGuard(5, 1.0))
+    last = events_of(TestClient(app).post("/api/review", json={"diff": DIFF}))[-1]
+    assert last["code"] == "auth"
+    assert "x-api-key" not in last["message"]
+
+
+def test_errors_are_logged_on_the_server(tmp_path, caplog):
+    app = create_app(review_fn=bad_key, data_dir=tmp_path, guard=UsageGuard(5, 1.0))
+    TestClient(app).post("/api/review", json={"diff": DIFF})
+    assert "invalid x-api-key" in caplog.text
